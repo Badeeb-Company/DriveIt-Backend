@@ -1,8 +1,8 @@
 module Api
 	module V1
 		class TripController < BaseController
-			skip_before_action :authenticate_user!, :except => [:request_trip, :cancel_trip]
-			skip_before_action :authenticate_driver!, :except => [:reject_trip, :accept_trip]
+			#skip_before_action :authenticate_user!, :except => [:request_trip, :cancel_trip]
+			#skip_before_action :authenticate_driver!, :except => [:reject_trip, :accept_trip]
 
 			api :POST, "/api/v1/trip", "Request Trip (Client side)"
 			param :destination, String, :required => true
