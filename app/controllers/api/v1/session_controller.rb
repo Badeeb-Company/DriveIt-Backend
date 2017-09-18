@@ -65,7 +65,7 @@ module Api
 				return render :status => STATUS_Unauthorized, :json => {:meta => {:status => STATUS_Unauthorized, :message => "Email or password incorrect"}}
 			end
 
-			api :POST, "api/v1/cleint/login", "Login Client"
+			api :POST, "api/v1/client/login", "Login Client"
 			# param_group :device
 			param :client, Hash, :required => true do
 				param :email, "Email", :required => true
