@@ -8,7 +8,7 @@ Rails.application.routes.draw do
   		post "driver", :to => "session#signup_driver"
   		post "client", :to => "session#signup_client"
   		post "driver/login", :to => "session#login_driver"
-  		post "client/login", :to => "session#login_clinet"
+  		post "client/login", :to => "session#login_client"
   		post "logout", :to => "session#logout"
   	end
   end
