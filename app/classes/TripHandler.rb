@@ -3,6 +3,7 @@ class TripHandler
 
 	def initialize (trip)
 		@trip = trip
+		@trip_location = [trip.lat,trip.long].to_a
 		@index = 0
 		@fir_drivers = []
 	end
@@ -25,9 +26,15 @@ class TripHandler
 		end
 		@fir_drivers = response.body
 		p "FIR Drivers #{@fir_drivers}"
-		while not @index >= @fir_drivers.keys.count 	
-			driver_id = @fir_drivers.keys[@index]
-			p "Driver id #{driver_id}"
+		@fir_drivers = filter_drivers(@fir_drivers)
+		p "Filtered Drivers #{@fir_drivers}"
+		choose_driver()
+	end
+	def choose_driver
+		while not @index >= @fir_drivers.count
+			p "Checking First Driver" 	
+			driver_id = @fir_drivers[@index]["driver_id"].to_i
+			p "Invite Driver with id #{driver_id}"
 			driver = Driver.where(id: driver_id, :invited => false).first
 			p "Invit Driver #{driver}"
 			if driver.present?
@@ -39,7 +46,30 @@ class TripHandler
 		p 'No Driver Avilable'
 		not_served()
 	end
-
+	def filter_drivers(drivers)
+		filtered_drivers = []
+		# p "Driver keys = #{drivers.keys}"
+		drivers.keys.each do |driver_id|
+			# p "Checking driver with id = #{driver_id}, location = #{drivers["#{driver_id}"]}"
+			driver_location = drivers["#{driver_id}"].to_a
+			# p driver_location
+			driver_source = [driver_location[0].last,driver_location[1].last].to_a
+			# p driver_source
+			# p @trip_location
+			driver_to_passenger_cost = Geocoder::Calculations::distance_between(driver_source, @trip_location, units: :km)
+			if driver_to_passenger_cost <= MAX_DISTANCE
+				dict = Hash.new()
+				dict["driver_id"] = driver_id
+				dict["distance"] = driver_to_passenger_cost
+				dict["lat"] = driver_source[0]
+				dict["long"] = driver_source[1]
+				filtered_drivers.append(dict)
+			end
+		end
+		# Then sort them
+		sorted_drivers = filtered_drivers.sort_by { |k| k["distance"] }
+		return sorted_drivers
+	end
 
 		# return drivers_fir
 		# @drivers = 
