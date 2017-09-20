@@ -12,7 +12,7 @@ class Driver < ApplicationRecord
   before_create :generate_access_token
   after_create :firebase_migrate
   def firebase_migrate
-    firebase = Firebase::Client.new(FIR_Base_URL)
+    firebase = Firebase::Client.new(Rails.application.secrets.FIR_Base_URL)
     response = firebase.set("drivers/#{self.id}/", { :state => "available", :trip => {:client_address => "", :client_image_url => "", :client_lat => 0, :client_long => 0 , :client_name => "", :client_phone => "", :id => -1}})
     unless response.success?
       self.errors.add(:firebase, "Cannot save record")

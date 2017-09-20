@@ -1,7 +1,7 @@
 module Api
 	module V1
 		class TripController < BaseController
-			require 'TripHandler'
+			require 'trip_handler.rb'
 			#skip_before_action :authenticate_user!, :except => [:request_trip, :cancel_trip]
 			#skip_before_action :authenticate_driver!, :except => [:reject_trip, :accept_trip]
 
@@ -12,8 +12,11 @@ module Api
 			header :Authorization, 'Access Token', :required => true
 			error STATUS_ERROR, "Server Error Message"
 			error STATUS_BAD_REQUEST, "Error Message"
-			meta :meta => {:status => STATUS_SUCCESS, :message => "Trip Requested"}, :trip => Trip.new().as_json()
+			meta :meta => {:status => STATUS_SUCCESS, :message => "Trip Requested"}, :trip => "Integer"
 			def request_trip
+				if current_user.blank?
+					return render :status => STATUS_ERROR, :json => {:meta => {:status => STATUS_ERROR, :message => "Not logged in"}}
+				end
 				# old_trip = Trip.where(:user_id => current_user.id, :trip_state => [Trip.trip_states[:pending], Trip.trip_states[:rejected]]).first
 				# p "old_trip = #{old_trip}"	
 				# # return render :status => STATUS_BAD_REQUEST, :json => {:meta => {:status => STATUS_BAD_REQUEST, :message => "Can't request more than one trip"}} unless old_trip.blank?
@@ -32,9 +35,11 @@ module Api
 			error STATUS_ERROR, "Server Error Message"
 			error STATUS_NotFound, "Trip Not Found"
 			error STATUS_BAD_REQUEST, "Error Message"
-			meta :meta => {:status => STATUS_SUCCESS, :message => "Trip Rejected"}, :trip_id => "Integer"			
+			meta :meta => {:status => STATUS_SUCCESS, :message => "Trip Rejected"}			
 			def reject_trip
-				
+				if current_driver.blank?
+					return render :status => STATUS_ERROR, :json => {:meta => {:status => STATUS_ERROR, :message => "Not logged in"}}
+				end
 				@trip = Trip.where(:id => params[:trip_id].to_i).first
 				return render :status => STATUS_NotFound, :json => {:meta => {:status => STATUS_NotFound, :message => "Trip not found"}} if @trip.blank?
 				handler = TripHandler.new(@trip)
@@ -48,8 +53,11 @@ module Api
 			error STATUS_ERROR, "Server Error Message"
 			error STATUS_NotFound, "Trip Not Found"
 			error STATUS_BAD_REQUEST, "Error Message"
-			meta :meta => {:status => STATUS_SUCCESS, :message => "Trip Accepted"}, :trip_id => "Integer"
+			meta :meta => {:status => STATUS_SUCCESS, :message => "Trip Accepted"}, :trip => "Integer"
 			def accept_trip
+				if current_driver.blank?
+					return render :status => STATUS_ERROR, :json => {:meta => {:status => STATUS_ERROR, :message => "Not logged in"}}
+				end
 				@trip = Trip.where(:id => params[:trip_id].to_i).first
 				return render :status => STATUS_NotFound, :json => {:meta => {:status => STATUS_NotFound, :message => "Trip not found"}} if @trip.blank?
 				handler = TripHandler.new(@trip)
@@ -64,8 +72,11 @@ module Api
 			error STATUS_ERROR, "Server Error Message"
 			error STATUS_NotFound, "Trip Not Found"
 			error STATUS_BAD_REQUEST, "Error Message"
-			meta :meta => {:status => STATUS_SUCCESS, :message => "Trip Canceled"}, :trip_id => "Integer"
+			meta :meta => {:status => STATUS_SUCCESS, :message => "Trip Canceled"}, :trip => "Integer"
 			def cancel_trip
+				if current_user.blank?
+					return render :status => STATUS_ERROR, :json => {:meta => {:status => STATUS_ERROR, :message => "Not logged in"}}
+				end
 				@trip = Trip.where(:id => params[:trip_id].to_i).first
 				return render :status => STATUS_NotFound, :json => {:meta => {:status => STATUS_NotFound, :message => "Trip not found"}} if @trip.blank?
 				handler = TripHandler.new(@trip)
@@ -78,8 +89,11 @@ module Api
 			error STATUS_ERROR, "Server Error Message"
 			error STATUS_NotFound, "Trip Not Found"
 			error STATUS_BAD_REQUEST, "Error Message"
-			meta :meta => {:status => STATUS_SUCCESS, :message => "Trip Completed"}, :trip_id => "Integer"			
+			meta :meta => {:status => STATUS_SUCCESS, :message => "Trip Completed"}, :trip => "Integer"			
 			def complete_trip
+				if current_driver.blank?
+					return render :status => STATUS_ERROR, :json => {:meta => {:status => STATUS_ERROR, :message => "Not logged in"}}
+				end
 				@trip = Trip.where(:id => params[:trip_id].to_i).first
 				return render :status => STATUS_NotFound, :json => {:meta => {:status => STATUS_NotFound, :message => "Trip not found"}} if @trip.blank?
 				handler = TripHandler.new(@trip)

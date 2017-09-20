@@ -29,6 +29,10 @@ gem 'jbuilder', '~> 2.5'
 gem 'firebase'
 # gem for calculating distance between 2 (lng/lat) locations
 gem 'geocoder'
+# Running jobs in the background
+gem 'delayed_job'
+gem 'delayed_job_active_record'
+gem 'daemons'
 
 gem 'fcm'
 # Use Redis adapter to run Action Cable in production
