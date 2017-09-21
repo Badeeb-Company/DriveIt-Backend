@@ -19,6 +19,7 @@ gem 'sass-rails', '~> 5.0'
 gem 'uglifier', '>= 1.3.0'
 # See https://github.com/rails/execjs#readme for more supported runtimes
 # gem 'therubyracer', platforms: :ruby
+gem 'net-ssh'
 
 # Use CoffeeScript for .coffee assets and views
 gem 'coffee-rails', '~> 4.2'
@@ -33,8 +34,20 @@ gem 'geocoder'
 gem 'delayed_job'
 gem 'delayed_job_active_record'
 gem 'daemons'
-
 gem 'fcm'
+
+
+# gem for Google Maps Web Service APIs
+gem 'google_maps_service', '~> 0.4.2'
+# gem for calculating distance between 2 (lng/lat) locations
+gem 'geocoder'
+# gem for adding geo functions
+gem 'geokit-rails'
+gem 'fog'
+gem "fog-google"
+gem 'google-api-client', '~> 0.11'
+gem "mime-types"
+
 # Use Redis adapter to run Action Cable in production
 # gem 'redis', '~> 3.0'
 # Use ActiveModel has_secure_password

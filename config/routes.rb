@@ -2,7 +2,8 @@ Rails.application.routes.draw do
   devise_for :drivers
   devise_for :users
   apipie
-      post "reset_trip", :to => "application#reset_trip"
+  post "reset_trip", :to => "application#reset_trip"
+  get "test_google_api", :to => "application#test_google_api"
   root :to => "apipie/apipies#index"
   namespace :api do
 		namespace :v1 do

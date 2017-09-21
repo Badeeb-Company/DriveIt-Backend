@@ -1,4 +1,5 @@
 class TripHandler
+	require 'distance_calculator.rb'
 	attr_accessor :trip
 
 	def initialize (trip)
@@ -18,6 +19,8 @@ class TripHandler
 		return {:client_address => @trip.destination, :client_image_url => @trip.user.image_url, :client_long => @trip.long, :client_lat => @trip.lat,:client_name => @trip.user.name, :client_phone => @trip.user.phone, :id => @trip.id, :state => Trip.trip_states.keys[@trip.trip_state]}
 	end
 	def find_driver
+		firebase = Firebase::Client.new(Rails.application.secrets.FIR_Base_URL)
+		response = firebase.set("clients/#{@trip.user.id}/trip/",self.client_data(driver))
 		delay.request_drivers
 		#request_drivers
 	end
