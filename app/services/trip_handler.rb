@@ -21,7 +21,7 @@ class TripHandler
 		firebase = Firebase::Client.new(Rails.application.secrets.FIR_Base_URL)
 		@trip.trip_state = Trip.trip_states[:pending]
     	@trip.save
-    	response = firebase.set("clients/#{@trip.user.id}/trip/",self.client_data(driver))		
+    	response = firebase.set("clients/#{@trip.user.id}/trip/",self.client_data(nil))		
 		delay.request_drivers
 		#request_drivers
 	end
