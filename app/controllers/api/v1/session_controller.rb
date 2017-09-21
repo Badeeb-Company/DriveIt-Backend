@@ -17,7 +17,7 @@ module Api
 				param :phone, "Phone", :required => true
 				param :image_url, "URL", :required => true
 				param :password, String, :required => true
-				param :name, "Name", :required => true
+				param :name, String, :required => true
 			end
 			error STATUS_BAD_REQUEST, "Error Message"
 			error STATUS_ERROR, "Server Error Message"
@@ -34,7 +34,7 @@ module Api
 				param :phone, "Phone", :required => true
 				param :image_url, "URL", :required => true
 				param :password, String, :required => true
-				param :name, "Name", :required => true
+				param :name, String, :required => true
 			end
 			error STATUS_BAD_REQUEST, "Error Message"
 			error STATUS_ERROR, "Server Error Message"
