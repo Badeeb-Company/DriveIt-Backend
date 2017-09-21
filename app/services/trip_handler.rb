@@ -229,7 +229,9 @@ class TripHandler
 		end
 		@trip.trip_state = Trip.trip_states[:completed]
 		@trip.save
-    	response = firebase.set("drivers/#{driver.id}/trip/", self.driver_data(driver))
+		if driver.present?
+    		response = firebase.set("drivers/#{driver.id}/trip/", self.driver_data(driver))
+    	end
     	# response = firebase.set("clients/#{@trip.user.id}/trip/",self.client_data(driver))
     	unless response.success?
       		trip.errors.add(:firebase, "Cannot save record")
@@ -249,7 +251,9 @@ class TripHandler
 
 		@trip.trip_state = Trip.trip_states[:cancelled]
 		@trip.save
-    	response = firebase.set("drivers/#{driver.id}/trip/", self.driver_data(driver))
+		if driver.present?
+    		response = firebase.set("drivers/#{driver.id}/trip/", self.driver_data(driver))
+    	end
     	response = firebase.set("clients/#{@trip.user.id}/trip/",self.client_data(driver))
     	unless response.success?
       		trip.errors.add(:firebase, "Cannot save record")
