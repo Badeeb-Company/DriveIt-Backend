@@ -25,6 +25,9 @@ class GoogleMapsApi
   end
 
   def self.calculate_batch_cost_metric(origins, destinations, api_type)
+    p "Origins #{origins}"
+    p "destionations #{destinations}"
+    p "ApiType #{api_type}"
     matrix = get_distance_matrix(origins, destinations, api_type)
     parse_batch_matrix(matrix)
   end

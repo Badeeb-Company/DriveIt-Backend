@@ -7,11 +7,11 @@ class DistanceCalculator
   end
 
   def batch_drivers_sources
-    @drivers.map {|driver| [driver["lat"],driver["long"]]}
+   return  @drivers.map {|driver| [driver[:lat],driver[:long]]}
   end
 
   def passenger_source
-    return [@client["lat"],@client["long"]]
+    return [@client[:lat],@client[:long]]
   end
   # Calculate Distance between Driver and location using google api
   def calculate_drivers_overhead_using_google_api()
