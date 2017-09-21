@@ -1,5 +1,4 @@
 class TripHandler
-	require 'distance_calculator.rb'
 	attr_accessor :trip
 
 	def initialize (trip)
@@ -11,18 +10,18 @@ class TripHandler
 
 	def client_data(driver)
 		if driver.blank?
-			return {:distance_to_arrive => 0, :driver_address => "", :driver_image_url => "", :driver_name => "", :id => @trip.id, :state => @trip.trip_state, :time_to_arrive => 10, :state => Trip.trip_states.keys[@trip.trip_state]}
+			return {:driver_phone => "", :driver_id => 0,:distance_to_arrive => 0, :driver_address => "", :driver_image_url => "", :driver_name => "", :id => @trip.id, :state => @trip.trip_state, :time_to_arrive => 10, :state => Trip.trip_states.keys[@trip.trip_state]}
 		end
-		return {:distance_to_arrive => 0, :driver_address => "", :driver_image_url => driver.image_url, :driver_name => driver.name, :id => @trip.id, :state => @trip.trip_state, :time_to_arrive => 10, :state => Trip.trip_states.keys[@trip.trip_state]}
+		return {:driver_phone => driver.phone, :driver_id => driver.id,:distance_to_arrive => 0, :driver_address => "", :driver_image_url => driver.image_url, :driver_name => driver.name, :id => @trip.id, :state => @trip.trip_state, :time_to_arrive => 10, :state => Trip.trip_states.keys[@trip.trip_state]}
 	end
 	def driver_data
-		return {:client_address => @trip.destination, :client_image_url => @trip.user.image_url, :client_long => @trip.long, :client_lat => @trip.lat,:client_name => @trip.user.name, :client_phone => @trip.user.phone, :id => @trip.id, :state => Trip.trip_states.keys[@trip.trip_state]}
+		return {:distance_to_arrive => 0,:client_address => @trip.destination, :client_id => @trip.user.id, :client_phone => @trip.user.phone, :client_image_url => @trip.user.image_url, :client_long => @trip.long, :client_lat => @trip.lat,:client_name => @trip.user.name, :client_phone => @trip.user.phone, :id => @trip.id, :state => Trip.trip_states.keys[@trip.trip_state]}
 	end
 	def find_driver
 		firebase = Firebase::Client.new(Rails.application.secrets.FIR_Base_URL)
 		@trip.trip_state = Trip.trip_states[:pending]
     	@trip.save
-    	response = firebase.set("clients/#{@trip.user.id}/trip/",self.client_data(driver))	
+    	response = firebase.set("clients/#{@trip.user.id}/trip/",self.client_data(nil))		
 		delay.request_drivers
 		#request_drivers
 	end
@@ -175,7 +174,7 @@ class TripHandler
 		@trip.trip_state = Trip.trip_states[:completed]
 		@trip.save
     	response = firebase.set("drivers/#{driver.id}/trip/", self.driver_data)
-    	response = firebase.set("clients/#{@trip.user.id}/trip/",self.client_data(driver))
+    	# response = firebase.set("clients/#{@trip.user.id}/trip/",self.client_data(driver))
     	unless response.success?
       		trip.errors.add(:firebase, "Cannot save record")
       		return false

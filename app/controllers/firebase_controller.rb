@@ -14,7 +14,7 @@ class FirebaseController < ApplicationController
 	end
 
 	api :GET, "user/trip", "Path to use when user listens for notifiaction about current trip"
-	meta :id => "Integer", :driver_id => "Integer", :trip_state => ["Pending", "Inprogress", "Rejected", "Completed"]
+	meta :id => "Integer", :driver_id => "Integer", :trip_state => Trip.trip_states.keys
 	
 	def client_listener
 		return render :status => STATUS_ERROR, :meta => {:status => STATUS_ERROR, :message => "Firebase method"}
