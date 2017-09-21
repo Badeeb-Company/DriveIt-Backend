@@ -1,6 +1,7 @@
 class Trip < ApplicationRecord
 	enum trip_states: [:pending, :notServed, :beingServed, :completed, :cancelled, :rejected]
 	belongs_to :user
+	has_many :trip_drivers
 	#belongs_to :driver
 	def driver
 		return nil if self.driver_id.blank?

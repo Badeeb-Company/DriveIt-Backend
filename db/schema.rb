@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170919211356) do
+ActiveRecord::Schema.define(version: 20170921203026) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -53,6 +53,17 @@ ActiveRecord::Schema.define(version: 20170919211356) do
     t.index ["reset_password_token"], name: "index_drivers_on_reset_password_token", unique: true
   end
 
+  create_table "trip_drivers", force: :cascade do |t|
+    t.bigint "trip_id"
+    t.bigint "driver_id"
+    t.float "distance"
+    t.float "time"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["driver_id"], name: "index_trip_drivers_on_driver_id"
+    t.index ["trip_id"], name: "index_trip_drivers_on_trip_id"
+  end
+
   create_table "trips", force: :cascade do |t|
     t.integer "user_id", null: false
     t.integer "driver_id"
@@ -62,6 +73,7 @@ ActiveRecord::Schema.define(version: 20170919211356) do
     t.float "lat", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.integer "index", default: 0
     t.index ["driver_id"], name: "index_trips_on_driver_id"
     t.index ["user_id"], name: "index_trips_on_user_id"
   end

@@ -1,0 +1,2 @@
+class TripDriver < ApplicationRecord
+end

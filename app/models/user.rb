@@ -14,7 +14,7 @@ class User < ApplicationRecord
 
   def firebase_migrate
     firebase = Firebase::Client.new(Rails.application.secrets.FIR_Base_URL)
-    response = firebase.set("clients/#{self.id}/", { :trip => {:distance_to_arrive => 0, :driver_address => "", :driver_image_url => "",:driver_lat => 0, :driver_long => 0, :driver_name => "", :driver_phone => "", :id => -1, :state => "notServed", :time_to_arrive => ""}})
+    response = firebase.set("clients/#{self.id}/", { :trip => {:driver_phone => "", :driver_id => 0,:distance_to_arrive => 0, :driver_address => "", :driver_image_url => "", :driver_name => "", :id => 0, :state => "", :time_to_arrive => 0, :state => ""}})
     unless response.success?
       self.errors.add(:firebase, "Cannot save record")
       return false

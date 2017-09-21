@@ -12,8 +12,8 @@ require "distance_calculator.rb"
 	end
 
 	def test_google_api
-		drivers = [{:id => 1, :lat => 20, :long => 10}, {:id => 2, :lat => 20, :long => 12}]
-		client = {:id => 1, :lat => 20, :long => 11}
+		drivers = [{:id => 1, "lat" => 20, "long" => 12}, {:id => 2, "lat" => 29.972207, "long" => 31.244723}]
+		client = {:id => 1, "lat" => 29.969375, "long" => 31.242907}
 		distance_calculator = DistanceCalculator.new()
 		return render :json => {:result => distance_calculator.calculate_distance(drivers,client)}
 	end

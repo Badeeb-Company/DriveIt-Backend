@@ -1,63 +1,44 @@
 class DistanceCalculator
   require "google_maps_api.rb"
-  def calculate_distance(drivers,client)
+  def calculate_distance(drivers,client,trip)
     @drivers = drivers
     @client = client
+    @trip = trip
     calculate_drivers_overhead_using_google_api()
+    begin
+      calculate_drivers_overhead_using_google_api() if !@drivers.empty?
+    rescue GoogleMapsService::Error::RateLimitError
+      @api_failed = true
+      Rails.logger.info('Google API limit reached while calculation of trip overhead', @trip)
+    end
+    return @drivers
   end
 
   def batch_drivers_sources
-   return  @drivers.map {|driver| [driver[:lat],driver[:long]]}
+   return  @drivers.map {|driver| [driver["lat"],driver["long"]]}
   end
 
   def passenger_source
-    return [@client[:lat],@client[:long]]
+    return [@trip[:lat],@trip[:long]]
   end
   # Calculate Distance between Driver and location using google api
   def calculate_drivers_overhead_using_google_api()
     
     # Batching Google APIs
+    p "Batch drivers Sources #{batch_drivers_sources}"
+    p "passenger_source #{passenger_source}"
+    p "API #{GoogleMapsApi::DRIVERS_OVERHEAD}"
     drivers_srcs_passenger_src = GoogleMapsApi.calculate_batch_cost_metric(
       batch_drivers_sources, [passenger_source],
       GoogleMapsApi::DRIVERS_OVERHEAD)
-    return drivers_srcs_passenger_src
-    # # Exclude drivers with time to passenger greater than 10 minutes
-    # exclude_drivers_with_long_time_to_pasenger(drivers_srcs_passenger_src)
-
-    # # Cache drivers sources to passenger for further uses
-    # cache_drivers_srcs_passenger_src(drivers_srcs_passenger_src)
-
-    # passenger_dest_drivers_dests = GoogleMapsApi.calculate_batch_cost_metric(
-    #   [passenger_destination], batch_drivers_destinations,
-    #   GoogleMapsApi::DRIVERS_OVERHEAD)
-
-
-    # # Run concurrently not in parallel which helps because of
-    # # redis and google api calls
-    # Parallel.each_with_index(@drivers, in_threads: 4) do |driver, i|
-    #   driver_to_passenger_cost = drivers_srcs_passenger_src[i]
-    #   passenger_destination_to_driver_desination_cost = passenger_dest_drivers_dests[i]
-    #   driver_route_cost = GoogleMapsApi.calculate_route_cost_metric(driver.location.to_a, driver.destination.to_a, GoogleMapsApi::DRIVERS_OVERHEAD)
-
-    #   next if driver_to_passenger_cost.nil? ||
-    #       passenger_destination_to_driver_desination_cost.nil? ||
-    #       driver_route_cost.nil?
-
-    #   # Calculating extra time and extra distance
-    #   extra_distance = driver_to_passenger_cost[0] +
-    #     passenger_route_cost[0] +
-    #     passenger_destination_to_driver_desination_cost[0] -
-    #     driver_route_cost[0]
-
-    #   extra_time = driver_to_passenger_cost[1] +
-    #     passenger_route_cost[1] +
-    #     passenger_destination_to_driver_desination_cost[1] -
-    #     driver_route_cost[1]
-
-    #   # Cache the result in Redis
-    #   cache_drivers_overhead(driver, extra_distance, extra_time)
-    # end
-    # Rails.logger.info('Done trip overhead calculation using Google API', @trip)
+    @drivers.each_with_index do |driver,i|
+      value = drivers_srcs_passenger_src[i]
+      unless value.blank?
+        driver[:distance] = {:distance => value[0], :time => value[1]}
+      else
+        @drivers -=[driver]
+      end
+    end
   end
 
   def exclude_drivers_with_long_time_to_pasenger(drivers_srcs_passenger_src)
