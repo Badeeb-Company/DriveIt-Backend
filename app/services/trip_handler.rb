@@ -52,11 +52,8 @@ class TripHandler
 		@driver_dict[:distance] = Hash.new()
 		@driver_dict[:distance][:distance] = 0
 		@driver_dict[:distance][:time] = 0
-
-			return {:driver_phone => "", :driver_id => 0,:distance_to_arrive => 0, :driver_address => "", :driver_image_url => "", :driver_name => "", :id => @trip.id, :state => @trip.trip_state, :time_to_arrive => 10, :state => Trip.trip_states.keys[@trip.trip_state]}
-		end
-		return {:driver_phone => driver.phone, :driver_id => driver.id,:distance_to_arrive => 0, :driver_address => "", :driver_image_url => driver.image_url, :driver_name => driver.name, :id => @trip.id, :state => @trip.trip_state, :time_to_arrive => 10, :state => Trip.trip_states.keys[@trip.trip_state]}
 	end
+
 
 	def find_driver
 		firebase = Firebase::Client.new(Rails.application.secrets.FIR_Base_URL)
