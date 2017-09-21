@@ -3,7 +3,7 @@ Rails.application.routes.draw do
   devise_for :users
   apipie
       post "reset_trip", :to => "application#reset_trip"
-
+  root :to => "apipie/apipies#index"
   namespace :api do
 		namespace :v1 do
   		post "driver", :to => "session#signup_driver"
