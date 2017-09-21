@@ -4,7 +4,8 @@ Rails.application.routes.draw do
   apipie
   post "reset_trip", :to => "application#reset_trip"
   get "test_google_api", :to => "application#test_google_api"
-  root :to => "apipie/apipies#index"
+  # root :to => "apipie/apipies#index"
+  root :to => "map#map"
   namespace :api do
 		namespace :v1 do
   		post "driver", :to => "session#signup_driver"

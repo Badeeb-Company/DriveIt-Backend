@@ -206,6 +206,7 @@ GEM
       rails (>= 3.0)
     globalid (0.4.0)
       activesupport (>= 4.2.0)
+    gmaps4rails (2.1.2)
     google-api-client (0.14.1)
       addressable (~> 2.5, >= 2.5.1)
       googleauth (~> 0.5)
@@ -383,6 +384,7 @@ DEPENDENCIES
   fog-google
   geocoder
   geokit-rails
+  gmaps4rails
   google-api-client (~> 0.11)
   google_maps_service (~> 0.4.2)
   jbuilder (~> 2.5)
