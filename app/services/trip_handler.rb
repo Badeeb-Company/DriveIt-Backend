@@ -35,8 +35,8 @@ class TripHandler
 	end
 	def driver_data(driver)
 		set_driver_dict(driver)
-		p "Distance to arrive = #{@driver_dict[:distance][:distance]}"
-		return {:distance_to_arrive => @driver_dict[:distance][:distance],:client_address => @trip.destination, :client_id => @trip.user.id, :client_phone => @trip.user.phone, :client_image_url => @trip.user.image_url, :client_long => @trip.long, :client_lat => @trip.lat,:client_name => @trip.user.name, :client_phone => @trip.user.phone, :id => @trip.id, :state => Trip.trip_states.keys[@trip.trip_state]}
+		p "Distance to arrive = #{@driver_dict[:distance][:time]}"
+		return {:distance_to_arrive => @driver_dict[:distance][:distance],:client_address => @trip.destination, :client_id => @trip.user.id, :client_phone => @trip.user.phone, :client_image_url => @trip.user.image_url, :client_long => @trip.long, :client_lat => @trip.lat,:client_name => @trip.user.name, :client_phone => @trip.user.phone, :id => @trip.id, :state => Trip.trip_states.keys[@trip.trip_state],:time_to_arrive => @driver_dict[:distance][:time]}
 	end
 	def set_driver_dict(driver)
 		p "Drivers count = #{@fir_drivers.count}"
@@ -44,6 +44,7 @@ class TripHandler
 			p "Checking driver dict #{driver_dict}"
 			if driver_dict[:id].to_i == driver.id
 				@driver_dict = driver_dict
+				p @driver_dict
 				return
 			end
 		end
@@ -192,6 +193,7 @@ class TripHandler
 		driver.save
 		driver_data_rejected = self.driver_data(driver)
 		driver_data_rejected[:state] = Trip.trip_states.keys[Trip.trip_states[:rejected]]
+    	
     	response = firebase.set("drivers/#{driver.id}/trip/", driver_data_rejected)
     	response = firebase.set("clients/#{@trip.user_id}/trip",self.client_data(driver))
     	unless response.success?
