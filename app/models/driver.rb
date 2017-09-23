@@ -5,15 +5,15 @@ class Driver < ApplicationRecord
          :recoverable, :rememberable, :trackable, :validatable
 
 
-  enum driver_states: [:available, :in_trip, :offline]
-
+  enum driver_states: [:AVAILABLE, :IN_TRIP, :INVITED]
+  enum driver_avilability: [:ONLINE, :OFFLINE]
   validates_uniqueness_of :phone
 
   before_create :generate_access_token
   after_create :firebase_migrate
   def firebase_migrate
     firebase = Firebase::Client.new(Rails.application.secrets.FIR_Base_URL)
-    response = firebase.set("drivers/#{self.id}/", { :state => "available", :trip => {:distance_to_arrive => 0,:time_to_arrive => 0, :client_address => "", :client_id => 0, :client_phone => "", :client_image_url => "", :client_long => 0, :client_lat => 0,:client_name => "", :client_phone => "", :id => 0, :state => ""}
+    response = firebase.set("drivers/#{self.id}/", {:trip => {:distance_to_arrive => 0,:time_to_arrive => 0, :client_address => "", :client_id => 0, :client_phone => "", :client_image_url => "", :client_long => 0, :client_lat => 0,:client_name => "", :client_phone => "", :id => 0, :state => ""}
 })
     unless response.success?
       self.errors.add(:firebase, "Cannot save record")
@@ -36,7 +36,7 @@ class Driver < ApplicationRecord
   private 
   def generate_access_token
   	self.token = Devise.friendly_token(length = 100)
-  	self.driver_state = Driver.driver_states[:available]
+  	self.driver_state = Driver.driver_states[:AVAILABLE]
   end
 
 end

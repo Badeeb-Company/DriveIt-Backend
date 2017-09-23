@@ -58,7 +58,7 @@ class TripHandler
 
 	def find_driver
 		firebase = Firebase::Client.new(Rails.application.secrets.FIR_Base_URL)
-		@trip.trip_state = Trip.trip_states[:pending]
+		@trip.trip_state = Trip.trip_states[:PENDING]
     	@trip.save
     	response = firebase.set("clients/#{@trip.user.id}/trip/",self.client_data(nil))	
 		delay.request_drivers
@@ -89,7 +89,7 @@ class TripHandler
 			p "Driver Dict #{@driver_dict}"
 			driver_id = @fir_drivers[@index][:id].to_i
 			p "Driver ID = #{driver_id}"
-			driver = Driver.where(id: driver_id, :invited => false).first
+			driver = Driver.where(id: driver_id, :driver_state => Driver.driver_states[:AVAILABLE], :driver_availability => Driver.driver_avilabilities[:ONLINE]).first
 			p "Driver #{driver}"
 			p "Invit Driver #{driver}"
 			if driver.present?
@@ -110,9 +110,9 @@ class TripHandler
 		Rails.logger.info("Trip = #{@trip.as_json({})}")
 		Rails.logger.info("Driver = #{driver.as_json({})}")
 		@trip = Trip.find(@trip.id)
-		if @trip.trip_state == Trip.trip_states[:pending] && @trip.driver_id.to_i == driver.id.to_i
+		if @trip.trip_state == Trip.trip_states[:PENDING] && @trip.driver_id.to_i == driver.id.to_i
 			Rails.logger.info("Invalidate")
-			driver_rejected(driver)
+			driver_rejected(driver,true)
 		else
 			Rails.logger.info("Keep Request")
 		end
@@ -125,20 +125,23 @@ class TripHandler
 		drivers.keys.each do |driver_id|
 			# p "Checking driver with id = #{driver_id}, location = #{drivers["#{driver_id}"]}"
 			driver_location = drivers["#{driver_id}"].to_a
-			# p driver_location
-			driver_source = [driver_location[0].last,driver_location[1].last].to_a
-			# p driver_source
-			# p @trip_location
-			driver_to_passenger_cost = Geocoder::Calculations::distance_between(driver_source, @trip_location, units: :km)
-			if driver_to_passenger_cost <= (Rails.application.secrets.max_distance)
-				dict = Hash.new()
-				dict[:id] = driver_id
-				dict[:distance] = Hash.new()
-				dict[:distance][:distance] = (driver_to_passenger_cost*1000.0).to_i
-				dict[:distance][:time] = 0
-				dict["lat"] = driver_source[0]
-				dict["long"] = driver_source[1]
-				filtered_drivers.append(dict)
+			driver = Driver.where(:id => driver_id, :driver_availability => Driver.driver_avilabilities[:ONLINE], :driver_state => [Driver.driver_states[:AVAILABLE], Driver.driver_states[:INVITED]]).first
+			if driver.present?
+				# p driver_location
+				driver_source = [driver_location[0].last,driver_location[1].last].to_a
+				# p driver_source
+				# p @trip_location
+				driver_to_passenger_cost = Geocoder::Calculations::distance_between(driver_source, @trip_location, units: :km)
+				if driver_to_passenger_cost <= (Rails.application.secrets.max_distance)
+					dict = Hash.new()
+					dict[:id] = driver_id
+					dict[:distance] = Hash.new()
+					dict[:distance][:distance] = (driver_to_passenger_cost*1000.0).to_i
+					dict[:distance][:time] = 0
+					dict["lat"] = driver_source[0]
+					dict["long"] = driver_source[1]
+					filtered_drivers.append(dict)
+				end
 			end
 		end
 		# Then sort them
@@ -160,8 +163,8 @@ class TripHandler
 	def invite_driver(driver)
 		firebase = Firebase::Client.new(Rails.application.secrets.FIR_Base_URL)
 		@trip.driver_id = driver.id
-		@trip.trip_state = Trip.trip_states[:pending]
-		driver.invited = true
+		@trip.trip_state = Trip.trip_states[:PENDING]
+		driver.driver_state = Driver.driver_states[:INVITED]
 		driver.save
 		@trip.save
     	response = firebase.set("drivers/#{driver.id}/trip/", self.driver_data(driver))
@@ -175,8 +178,9 @@ class TripHandler
 	def driver_accepted(driver)
 		firebase = Firebase::Client.new(Rails.application.secrets.FIR_Base_URL)
 		@trip.driver_id = driver.id
-		@trip.trip_state = Trip.trip_states[:beingServed]
+		@trip.trip_state = Trip.trip_states[:IN_PROGRESS]
 		@trip.save
+		driver.update_attributes(:driver_state => Driver.driver_states[:IN_TRIP])
     	firebase.set("drivers/#{driver.id}/", {:state => "in_trip", :trip => self.driver_data(driver)})
     	response = firebase.set("clients/#{@trip.user.id}/trip/",self.client_data(driver))
     	unless response.success?
@@ -185,17 +189,20 @@ class TripHandler
       	end
 	end
 
-	def driver_rejected(driver)
+	def driver_rejected(driver,expired)
 		firebase = Firebase::Client.new(Rails.application.secrets.FIR_Base_URL)
 		# @trip.trip_state = Trip.trip_states[:notServed]
 		# @trip.save
-		driver.invited = false
-		driver.save
+		driver.update_attributes(:driver_state => Driver.driver_states[:AVAILABLE])
+
 		driver_data_rejected = self.driver_data(driver)
-		driver_data_rejected[:state] = Trip.trip_states.keys[Trip.trip_states[:rejected]]
-    	
+		if expired
+			driver_data_rejected[:state] = Trip.trip_states.keys[Trip.trip_states[:EXPIRED]]
+    	else
+			driver_data_rejected[:state] = Trip.trip_states.keys[Trip.trip_states[:REJECTED]]
+    	end	
     	response = firebase.set("drivers/#{driver.id}/trip/", driver_data_rejected)
-    	response = firebase.set("clients/#{@trip.user_id}/trip",self.client_data(driver))
+    	# response = firebase.set("clients/#{@trip.user_id}/trip",self.client_data(driver))
     	unless response.success?
       		@trip.errors.add(:firebase, "Cannot save record")
       		return false
@@ -206,13 +213,12 @@ class TripHandler
 
 	def not_served
 		firebase = Firebase::Client.new(Rails.application.secrets.FIR_Base_URL)
-		@trip.update_attributes(:trip_state => Trip.trip_states[:notServed])
+		@trip.update_attributes(:trip_state => Trip.trip_states[:NOT_SERVED])
     	if @trip.driver_id.present?
     		driver = Driver.where(:id => @trip.driver_id).first
-    		driver.invited = false
+    		driver.update_attributes(:driver_state => Driver.driver_states[:AVAILABLE])
     		if driver.present?
-		    	response = firebase.set("drivers/#{driver.id}/trip/", self.driver_data(driver))
-
+		    	# response = firebase.set("drivers/#{driver.id}/trip/", self.driver_data(driver))
 		    end
 		end
 		response = firebase.set("clients/#{@trip.user.id}/trip/",self.client_data(driver))
@@ -226,10 +232,10 @@ class TripHandler
 		driver = @trip.driver
 		unless driver.blank?
 			p "Driver = #{driver}"			
-    		driver.invited = false
+    		driver.update_attributes(:driver_state => Driver.driver_states[:AVAILABLE])
 			driver.save
 		end
-		@trip.trip_state = Trip.trip_states[:completed]
+		@trip.trip_state = Trip.trip_states[:COMPLETED]
 		@trip.save
 		if driver.present?
     		response = firebase.set("drivers/#{driver.id}/trip/", self.driver_data(driver))
@@ -247,11 +253,11 @@ class TripHandler
 		driver = @trip.driver
 		unless driver.blank?
 			p "Driver = #{driver}"			
-    		driver.invited = false
+    		driver.update_attributes(:driver_state => Driver.driver_states[:AVAILABLE])
 			driver.save
 		end
 
-		@trip.trip_state = Trip.trip_states[:cancelled]
+		@trip.trip_state = Trip.trip_states[:CANCELLED]
 		@trip.save
 		if driver.present?
     		response = firebase.set("drivers/#{driver.id}/trip/", self.driver_data(driver))

@@ -43,10 +43,10 @@ class DeviseCreateDrivers < ActiveRecord::Migration[5.1]
     add_index :drivers, :email,                unique: true
     add_index :drivers, :reset_password_token, unique: true
     add_column :users,:phone, :string
-    remove_column :users, :username
-    remove_column :users,:user_type
-    remove_column :users,:lat
-    remove_column :users, :lng
+    remove_column :users, :username, :string
+    remove_column :users,:user_type, :integer
+    remove_column :users,:lat, :float
+    remove_column :users, :lng, :float
 
     # add_index :drivers, :confirmation_token,   unique: true
     # add_index :drivers, :unlock_token,         unique: true

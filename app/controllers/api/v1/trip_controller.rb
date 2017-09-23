@@ -20,7 +20,7 @@ module Api
 				# old_trip = Trip.where(:user_id => current_user.id, :trip_state => [Trip.trip_states[:pending], Trip.trip_states[:rejected]]).first
 				# p "old_trip = #{old_trip}"	
 				# # return render :status => STATUS_BAD_REQUEST, :json => {:meta => {:status => STATUS_BAD_REQUEST, :message => "Can't request more than one trip"}} unless old_trip.blank?
-				@trip = Trip.new(:destination => params[:destination], :long => params[:long], :lat => params[:lat], :user_id => current_user.id, :trip_state => Trip.trip_states[:pending])
+				@trip = Trip.new(:destination => params[:destination], :long => params[:long], :lat => params[:lat], :user_id => current_user.id, :trip_state => Trip.trip_states[:PENDING])
 				return render :status => STATUS_ERROR, :json => {:meta => {:status => STATUS_ERROR, :message => @trip.errors.full_messages.first}} unless @trip.save
 				handler = TripHandler.new(@trip)
 				handler.find_driver()
@@ -43,7 +43,7 @@ module Api
 				@trip = Trip.where(:id => params[:trip_id].to_i).first
 				return render :status => STATUS_NotFound, :json => {:meta => {:status => STATUS_NotFound, :message => "Trip not found"}} if @trip.blank?
 				handler = TripHandler.new(@trip)
-				handler.driver_rejected(current_driver)
+				handler.driver_rejected(current_driver,false)
 				return render :status => STATUS_SUCCESS, :json => {:meta => {:status => STATUS_SUCCESS, :message => "Trip Rejected"}}
 			end
 
