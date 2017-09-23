@@ -40,13 +40,13 @@
 
   </script>
     <script>
-      var myFirebase = new Firebase('https://driveit-e768a.firebaseio.com/development/locations/');
+      var myFirebase = new Firebase('https://driveit-e768a.firebaseio.com/development/locations/drivers/');
       var map;
       var features = []
     var markers = []
       function initMap() {
         map = new google.maps.Map(document.getElementById('map'), {
-          zoom: 16,
+          zoom: 6,
           center: new google.maps.LatLng(28.94, 31.244723),
           mapTypeId: 'roadmap'
         });
@@ -71,7 +71,7 @@
         /** Function to add a data listener **/
 
     var startListening = function() {
-      myFirebase.on('child_changed', function(snapshot) {
+      myFirebase.on('value', function(snapshot) {
         console.log(snapshot.val())
         markers.forEach(function(marker) {
           marker.setMap(null);
@@ -82,9 +82,10 @@
         for (var key in dictionary) {
           if (key != "driver_id") {
             if (dictionary.hasOwnProperty(key)) {
+              console.log(dictionary);
               var val = dictionary[key]
               console.log(key, dictionary[key]);
-              console.log(val["lat"])
+              console.log(val)
               features.push({
               position: new google.maps.LatLng(val["lat"], val["long"]),
               // position: new google.maps.LatLng(-33.91539, 151.22820),
