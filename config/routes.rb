@@ -17,6 +17,7 @@ Rails.application.routes.draw do
       post "trip/:trip_id/reject", :to => "trip#reject_trip"
       post "trip/:trip_id/cancel", :to => "trip#cancel_trip"
       post "trip/:trip_id/complete", :to => "trip#complete_trip"
+      patch "driver", :to => "session#update_driver"
   	end
   end
   # For details on the DSL available within this file, see http://guides.rubyonrails.org/routing.html

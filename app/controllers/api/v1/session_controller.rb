@@ -106,11 +106,11 @@ module Api
 			error STATUS_ERROR, "Driver not found"
 			meta :meta => {:status => STATUS_SUCCESS, :message => "Driver updated"}
 			def update_driver
-				@driver = currnet_driver
+				@driver = current_driver
 				if @driver.blank?
 					return render :status => STATUS_ERROR, :json => {:meta => {:status => STATUS_ERROR, :message => "Driver not found"}}					
 				end
-				@driver.update_attributes(Driver.driver_avilabilities["#{params[:avilability]}"])
+				@driver.update_attributes(:driver_availability => Driver.driver_avilabilities["#{params[:avilability]}"])
 				return render :status => STATUS_SUCCESS, :json => {:meta => {:status => STATUS_SUCCESS, :message => "Driver Updated"}}
 			end
 
