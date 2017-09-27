@@ -19,13 +19,20 @@ require "distance_calculator.rb"
 
 		firebase = Firebase::Client.new(Rails.application.secrets.FIR_Base_URL)
 		index  = 0
-		lat = 31.29
-		long = 29.955
-		while index <= 10000
+		lat = [31.242250,31.2422,31.242255,31.2422, 31.242255]
+		long = [29.968526,29.968526,29.968526,29.9685,29.9685]
+		response = firebase.set("locations/drivers/5/",{:lat => lat[0], :long => long[0] })
+		while index <= 1000
+			index = index + 1
+    		response = firebase.set("locations/drivers/1/",{:lat => lat[1], :long => long[1] })
+    		long[1] = long[1] + 0.00002
+    		response = firebase.set("locations/drivers/2/",{:lat => lat[2], :long => long[2] })
+    		long[2] = long[2] - 0.00002
+    		response = firebase.set("locations/drivers/3/",{:lat => lat[3], :long => long[3] })
+    		lat[3] = lat[3] - 0.00002
+    		response = firebase.set("locations/drivers/4/",{:lat => lat[4], :long => long[4] })
+    		lat[4] = lat[4] + 0.00002
 
-    		response = firebase.set("locations/drivers/1/",{:lat => lat, :long => long })
-    		index = index + 1
-    		long = long + 0.01
     	end
     	return render :json => "Success"
 	end

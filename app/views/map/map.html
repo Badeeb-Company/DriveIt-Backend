@@ -63,7 +63,8 @@
           },
           car: {
             name: 'Car',
-            icon: iconBase + 'info-i_maps.png'
+            // icon: iconBase + 'info-i_maps.png'
+            icon: '/assets/car.png'
           }
         };
         /** Function to add a data listener **/
@@ -94,8 +95,8 @@
           var val = snapshot.val()
           var position = new google.maps.LatLng(val["lat"],val["long"])
           var marker = markers[driver_id]
-          marker.position = position
-          marker.setMap(map)
+          marker.setPosition(position)
+          // marker.setMap(map)
           markers[driver_id] = marker
           }else{
           console.log('Invalid Driver Id')
