@@ -183,7 +183,7 @@ class TripHandler
 		driver.update_attributes(:driver_state => Driver.driver_states[:IN_TRIP])
     	firebase.set("drivers/#{driver.id}/", {:state => "in_trip", :trip => self.driver_data(driver)})
     	client_data_dict =  self.client_data(driver)
-    	client_data_dict[:state] = Trip.trip_states[:ACCEPTED]
+    	client_data_dict[:state] = Trip.trip_states.keys[Trip.trip_states[:ACCEPTED]]
     	response = firebase.set("clients/#{@trip.user.id}/trip/",client_data_dict)
     	unless response.success?
       		@trip.errors.add(:firebase, "Cannot save record")
