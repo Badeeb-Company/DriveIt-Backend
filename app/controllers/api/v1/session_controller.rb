@@ -86,16 +86,17 @@ module Api
 				end
 				return render :status => STATUS_Unauthorized, :json => {:meta => {:status => STATUS_Unauthorized, :message => "Email or password incorrect"}}
 			end
-			api :POST, "/api/v1/logout", "Logout User (driver/client)"
+			api :POST, "api/v1/logout", "Logout User (driver/client)"
 			# param_group :device
 			header :Authorization, 'Access Token', :required => true
 			error STATUS_ERROR, "Server Error Message"
 			meta :meta => {:status => STATUS_SUCCESS, :message => "User Logged Out"}
 			def logout
-				if currnet_driver.blank?
+				@driver = current_driver
+				if @driver.blank?
 					return render :status => STATUS_ERROR, :json => {:meta => {:status => STATUS_ERROR, :message => "Driver not found"}}
 				end
-				@driver = currnet_driver
+				
 				@driver.update_attributes(:driver_availability => Driver.driver_avilabilities[:OFFLINE])
 				return render :status => STATUS_SUCCESS, :json => {:meta => {:status => STATUS_SUCCESS, :message => "Driver Logged Out"}}
 			end
