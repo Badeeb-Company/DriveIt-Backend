@@ -4,10 +4,10 @@ class DistanceCalculator
     @drivers = drivers
     @client = client
     @trip = trip
-    calculate_drivers_overhead_using_google_api()
+    calculate_drivers_overhead_using_google_api() if !@drivers.empty?
     begin
       calculate_drivers_overhead_using_google_api() if !@drivers.empty?
-    rescue GoogleMapsService::Error::RateLimitError
+    rescue Exception
       @api_failed = true
       Rails.logger.info('Google API limit reached while calculation of trip overhead', @trip)
     end

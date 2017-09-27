@@ -1,8 +1,21 @@
 class Trip < ApplicationRecord
-	enum trip_states: [:pending, :notServed, :beingServed, :completed, :cancelled, :rejected]
+	enum trip_states: [:PENDING, :ACCEPTED, :NOT_SERVED, :EXPIRED, :IN_PROGRESS, :COMPLETED, :CANCELLED, :REJECTED]
 	belongs_to :user
 	has_many :trip_drivers
 	#belongs_to :driver
+=begin
+	- Client —> 
+	  1) PENDING
+	  2) ACCEPTED
+   	  3) NOT_SERVED
+	- Driver —> 
+	1) PENDING
+  	2) EXPIRED
+	3) IN_PROGRESS
+	4) COMPLETED
+	5) CANCELLED
+	6) REJECTED
+=end
 	def driver
 		return nil if self.driver_id.blank?
 		return Driver.where(:id => self.driver_id).first
