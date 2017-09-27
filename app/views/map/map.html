@@ -42,8 +42,7 @@
     <script>
       var myFirebase = new Firebase('https://driveit-e768a.firebaseio.com/development/locations/drivers/');
       var map;
-      var features = []
-      var markers = []
+      var markers = {}
       
       function initMap() {
         map = new google.maps.Map(document.getElementById('map'), {
@@ -62,65 +61,62 @@
             name: 'Library',
             icon: iconBase + 'library_maps.png'
           },
-          info: {
-            name: 'Info',
+          car: {
+            name: 'Car',
             icon: iconBase + 'info-i_maps.png'
           }
         };
         /** Function to add a data listener **/
-    var default_marker = new google.maps.Marker({
-            position: new google.maps.LatLng(0, 0),
-            icon: icons['info'].icon,
-            map: map
-          });
-    default_marker.setMap(map)
+
     var startListening = function() {
-      myFirebase.on('value', function(snapshot) {
-        console.log(snapshot.val())
-        markers.forEach(function(marker) {
-          marker.setMap(null);
-        });
-        markers = [];
-        features = [];
-        var dictionary = snapshot.val()
-        for (var key in dictionary) {
-          if (key != "driver_id") {
-            if (key == "2"){
-              var val = dictionary[key]
-              var position = new google.maps.LatLng(val["lat"], val["long"])
-              if (!default_marker.position.equals(position)){
-                console.log(position)
-                console.log(default_marker.position)
-                  console.log('Not Equal')
-                  default_marker.position = position
-                  default_marker.setMap(map)
-              }
-            }else if (dictionary.hasOwnProperty(key)) {
-            //   console.log(dictionary);
-            //   var val = dictionary[key]
-            //   console.log(key, dictionary[key]);
-            //   console.log(val)
-            //   features.push({
-            //   position: new google.maps.LatLng(val["lat"], val["long"]),
-            //   // position: new google.maps.LatLng(-33.91539, 151.22820),
-            //   type : 'info'
-            // });   
-            }
-          }
-        }
-        console.log("Features")
-        console.log(features)
-        // Create markers.
-        features.forEach(function(feature) {
+      myFirebase.on('child_added', function(snapshot) {
+        var driver_id = snapshot.key()
+        if (parseInt(driver_id)) {
+          console.log('Valid Driver ID')
+          var val = snapshot.val()
+          var position = new google.maps.LatLng(val["lat"],val["long"])
           var marker = new google.maps.Marker({
-            position: feature.position,
-            icon: icons[feature.type].icon,
-            map: map
+              position: position,
+              icon: icons['car'].icon,
+              map: map
           });
           marker.setMap(map)
-          markers.push(marker)
-        });
+          markers[driver_id] = marker
+          }else{
+          console.log('Invalid Driver Id')
+        }
       });
+
+      myFirebase.on('child_changed', function(snapshot) {
+        var driver_id = snapshot.key()
+        if (parseInt(driver_id)) {
+          console.log('Valid Driver ID')
+          var val = snapshot.val()
+          var position = new google.maps.LatLng(val["lat"],val["long"])
+          var marker = markers[driver_id]
+          marker.position = position
+          marker.setMap(map)
+          markers[driver_id] = marker
+          }else{
+          console.log('Invalid Driver Id')
+        }
+      });
+      myFirebase.on('child_removed', function(snapshot) {
+        var driver_id = snapshot.key()
+        if (parseInt(driver_id)) {
+          console.log('Valid Driver ID')
+          var val = snapshot.val()
+          var position = new google.maps.LatLng(val["lat"],val["long"])
+          var marker = markers[driver_id]
+          
+          marker.setMap(null)
+          markers[driver_id] = null
+          }else{
+          console.log('Invalid Driver Id')
+        }
+      });
+
+
     }
 
     // Begin listening for data
