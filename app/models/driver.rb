@@ -32,7 +32,9 @@ class Driver < ApplicationRecord
 	   json = super(options)
      return json
   end  
-
+  def map_description
+    return "Name: #{self.name}<br /><br />Phone: #{self.phone}<br /><br />Availability: #{Driver.driver_avilabilities.keys[self[:driver_availability]]}\n\nState: #{Driver.driver_states.keys[self[:driver_state]]}"
+  end
   private 
   def generate_access_token
   	self.token = Devise.friendly_token(length = 100)

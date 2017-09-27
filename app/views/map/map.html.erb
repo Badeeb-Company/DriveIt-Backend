@@ -79,9 +79,21 @@
           var marker = new google.maps.Marker({
               position: position,
               icon: icons['car'].icon,
+              title: driver_id,
               map: map
+              
           });
           marker.setMap(map)
+          marker.addListener('click', function() {
+            // var drivers = "<%= "Name: #{@drivers.first.name}  $(marker.title) Phone: #{@drivers.first.phone}  Availability: #{Driver.driver_avilabilities.keys[@drivers.first[:driver_availability]]}  State: #{Driver.driver_states.keys[@drivers.first[:driver_state]]}"%>"
+            var drivers = "<%= @drivers%>"
+            console.log(drivers.first)
+            var infowindow = new google.maps.InfoWindow({
+              content: "driver"
+            });
+            infowindow.open(map, marker);
+          });
+
           markers[driver_id] = marker
           }else{
           console.log('Invalid Driver Id')
@@ -96,7 +108,7 @@
           var position = new google.maps.LatLng(val["lat"],val["long"])
           var marker = markers[driver_id]
           marker.setPosition(position)
-          // marker.setMap(map)
+          
           markers[driver_id] = marker
           }else{
           console.log('Invalid Driver Id')
@@ -127,5 +139,6 @@
     <script async defer
     src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDabHITcg1cwDz_ofOLxjQqe9kG9zFf2yM&callback=initMap">
     </script>
+
   </body>
 </html>
