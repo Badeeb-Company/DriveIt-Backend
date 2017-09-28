@@ -30,10 +30,13 @@ class Driver < ApplicationRecord
 	  	options[:except] ||= [:token]
 	  end
 	   json = super(options)
+     if options[:html] == true
+        return json.to_json.html_safe
+      end
      return json
   end  
   def map_description
-    return "Name: #{self.name}<br /><br />Phone: #{self.phone}<br /><br />Availability: #{Driver.driver_avilabilities.keys[self[:driver_availability]]}\n\nState: #{Driver.driver_states.keys[self[:driver_state]]}"
+    return "Name: #{self.name}, Phone: #{self.phone}, Availability: #{Driver.driver_avilabilities.keys[self[:driver_availability]]}, State: #{Driver.driver_states.keys[self[:driver_state]]}".html_safe
   end
   private 
   def generate_access_token

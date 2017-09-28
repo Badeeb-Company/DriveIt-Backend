@@ -87,11 +87,19 @@
           marker.addListener('click', function() {
             // var drivers = "<%= "Name: #{@drivers.first.name}  $(marker.title) Phone: #{@drivers.first.phone}  Availability: #{Driver.driver_avilabilities.keys[@drivers.first[:driver_availability]]}  State: #{Driver.driver_states.keys[@drivers.first[:driver_state]]}"%>"
             var drivers = "<%= @drivers%>"
-            console.log(drivers.first)
-            var infowindow = new google.maps.InfoWindow({
-              content: "driver"
-            });
-            infowindow.open(map, marker);
+            var driversCount = drivers.length
+            console.log(drivers)
+            var driver = "Not find"
+            <% @drivers.each do |driver| %>
+              if (<%=driver.id%> == marker.title){
+                // alert('A7A')
+                var infowindow = new google.maps.InfoWindow({
+                  content: "<p>" +"<%=driver.name%>" + "<br />" + "<%=Driver.driver_avilabilities.keys[driver.driver_availability]%>" + "<br />" + "<%= Driver.driver_states.keys[driver.driver_state]%>" + "</p>"
+                });
+                infowindow.open(map, marker);
+              }
+            <%end%>
+
           });
 
           markers[driver_id] = marker
