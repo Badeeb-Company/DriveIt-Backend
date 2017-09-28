@@ -6,6 +6,7 @@ Rails.application.routes.draw do
   get "test_google_api", :to => "application#test_google_api"
   # root :to => "apipie/apipies#index"
   root :to => "map#map"
+  get "map", :to => "map#map"
   namespace :api do
 		namespace :v1 do
   		post "driver", :to => "session#signup_driver"

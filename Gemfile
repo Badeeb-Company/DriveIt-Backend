@@ -23,19 +23,27 @@ gem 'net-ssh'
 
 # Use CoffeeScript for .coffee assets and views
 gem 'coffee-rails', '~> 4.2'
-# Turbolinks makes navigating your web application faster. Read more: https://github.com/turbolinks/turbolinks
-gem 'turbolinks', '~> 5'
-# Build JSON APIs with ease. Read more: https://github.com/rails/jbuilder
-gem 'jbuilder', '~> 2.5'
+
+
 gem 'firebase'
-# gem for calculating distance between 2 (lng/lat) locations
-gem 'geocoder'
 # Running jobs in the background
 gem 'delayed_job'
 gem 'delayed_job_active_record'
 gem 'daemons'
 gem 'fcm'
 
+# Use jquery as the JavaScript library
+gem 'jquery-rails'
+# Turbolinks makes navigating your web application faster. Read more: https://github.com/turbolinks/turbolinks
+gem 'turbolinks', '~> 5'
+# Build JSON APIs with ease. Read more: https://github.com/rails/jbuilder
+gem 'jbuilder', '~> 2.5'
+# bundle exec rake doc:rails generates the API under doc/api.
+gem 'sdoc'#, '~> 0.4.0'
+# bootstrap
+gem 'bootstrap-generators', '~> 3.3.4'
+# paperclip
+gem 'paperclip', '4.3.5'
 
 # gem for Google Maps Web Service APIs
 gem 'google_maps_service', '~> 0.4.2'
