@@ -9,7 +9,7 @@ class TripHandler
 		load_drivers
 	end
 	def load_drivers
-		@trip.trip_drivers.each do |driver|
+		@trip.trip_drivers.order(id: :ASC).each do |driver|
 			driver_dict = Hash.new()
 			driver_dict[:id] = driver.driver_id
 			driver_dict[:distance] = Hash.new
