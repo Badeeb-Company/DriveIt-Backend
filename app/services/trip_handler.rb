@@ -168,7 +168,7 @@ class TripHandler
 		if @trip.trip_state == Trip.trip_states[:PENDING]
 			firebase = Firebase::Client.new(Rails.application.secrets.FIR_Base_URL)
 			@trip.driver_id = driver.id
-			@trip.trip_state = Trip.trip_states[:PENDING]
+			# @trip.trip_state = Trip.trip_states[:PENDING]
 			driver.driver_state = Driver.driver_states[:INVITED]
 			driver.save
 			@trip.save
