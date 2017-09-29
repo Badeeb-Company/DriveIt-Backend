@@ -3,6 +3,7 @@ module Api
 		class BaseController < ApplicationController
 		#	before_action :authenticate_user!
 		#	before_action :authenticate_driver!
+		skip_before_action :authenticate_admin!
 			# around_filter :set_current_user
  			rescue_from Apipie::ParamError do |e|
       			render :status => STATUS_ERROR, :json => {:meta => {:status => STATUS_ERROR, :message => e.message}} 

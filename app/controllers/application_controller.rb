@@ -1,7 +1,7 @@
 class ApplicationController < ActionController::Base
 #  protect_from_forgery with: :exception
 require "distance_calculator.rb"
-before_action :authenticate_admin!
+before_action :authenticate_admin!, :except => [:test_google_api]
 	def reset_trip
 		Trip.all.each do |trip|
 			trip.update_attributes(:trip_state => Trip.trip_states[:notServed])
