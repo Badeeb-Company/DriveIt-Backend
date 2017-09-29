@@ -34,7 +34,7 @@ module Api
 			header :Authorization, 'Access Token', :required => true
 			error STATUS_ERROR, "Server Error Message"
 			error STATUS_NotFound, "Trip Not Found"
-			error STATUS_BAD_REQUEST, "Error Message"
+			error STATUS_UNPROCESSABEL, "Error Message"
 			meta :meta => {:status => STATUS_SUCCESS, :message => "Trip Rejected"}			
 			def reject_trip
 				if current_driver.blank?
@@ -47,7 +47,7 @@ module Api
 					handler.driver_rejected(current_driver,false)
 					return render :status => STATUS_SUCCESS, :json => {:meta => {:status => STATUS_SUCCESS, :message => "Trip Rejected"}}
 				else
-					return render :status => STATUS_BAD_REQUEST, :json => {:meta => {:status => STATUS_BAD_REQUEST, :message => "Bad Request"}}
+					return render :status => STATUS_UNPROCESSABEL, :json => {:meta => {:status => STATUS_UNPROCESSABEL, :message => "unprocessable_entity"}}
 				end
 
 			end
@@ -57,7 +57,7 @@ module Api
 			header :Authorization, 'Access Token', :required => true
 			error STATUS_ERROR, "Server Error Message"
 			error STATUS_NotFound, "Trip Not Found"
-			error STATUS_BAD_REQUEST, "Error Message"
+			error STATUS_UNPROCESSABEL, "Error Message"
 			meta :meta => {:status => STATUS_SUCCESS, :message => "Trip Accepted"}, :trip => "Integer"
 			def accept_trip
 				if current_driver.blank?
@@ -71,7 +71,7 @@ module Api
 					handler.driver_accepted(current_driver)
 					return render :status => STATUS_SUCCESS, :json => {:meta => {:status => STATUS_SUCCESS, :message => "Trip Accepted"}, :trip => @trip.id}
 				else
-					return render :status => STATUS_BAD_REQUEST, :json => {:meta => {:status => STATUS_BAD_REQUEST, :message => "Bad Request"}}
+					return render :status => STATUS_UNPROCESSABEL, :json => {:meta => {:status => STATUS_UNPROCESSABEL, :message => "unprocessable_entity"}}
 				end
 			end
 

@@ -4,6 +4,6 @@ STATUS_Unauthorized = 401
 STATUS_ERROR = 500
 STATUS_NotFound = 404
 FIR_Base_URL = "https://friendlychat-76649.firebaseio.com/"
-
+STATUS_UNPROCESSABEL = 422
 
 MAX_DISTANCE = 5
