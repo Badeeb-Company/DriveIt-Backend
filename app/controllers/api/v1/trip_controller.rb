@@ -42,7 +42,7 @@ module Api
 				end
 				@trip = Trip.where(:id => params[:trip_id].to_i).first
 				return render :status => STATUS_NotFound, :json => {:meta => {:status => STATUS_NotFound, :message => "Trip not found"}} if @trip.blank?
-				if @trip.trip_state = Trip.trip_states[:PENDING] && @trip.driver_id == current_driver.id
+				if @trip.trip_state == Trip.trip_states[:PENDING] && @trip.driver_id == current_driver.id
 					handler = TripHandler.new(@trip)
 					handler.driver_rejected(current_driver,false)
 					return render :status => STATUS_SUCCESS, :json => {:meta => {:status => STATUS_SUCCESS, :message => "Trip Rejected"}}
@@ -65,7 +65,7 @@ module Api
 				end
 				@trip = Trip.where(:id => params[:trip_id].to_i).first
 				return render :status => STATUS_NotFound, :json => {:meta => {:status => STATUS_NotFound, :message => "Trip not found"}} if @trip.blank?
-				if @trip.trip_state = Trip.trip_states[:PENDING] && @trip.driver_id == current_driver.id
+				if @trip.trip_state == Trip.trip_states[:PENDING] && @trip.driver_id == current_driver.id
 					handler = TripHandler.new(@trip)
 					p "Current Driver #{current_driver}"
 					handler.driver_accepted(current_driver)

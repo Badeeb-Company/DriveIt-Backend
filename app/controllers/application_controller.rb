@@ -26,13 +26,13 @@ before_action :authenticate_admin!, :except => [:test_google_api]
 		while index <= 1000
 			index = index + 1
     		response = firebase.set("locations/drivers/1/",{:lat => lat[1], :long => long[1] })
-    		long[1] = long[1] + 0.00002
+    		long[1] = long[1] + 0.000002
     		response = firebase.set("locations/drivers/2/",{:lat => lat[2], :long => long[2] })
-    		long[2] = long[2] - 0.00002
+    		long[2] = long[2] - 0.000002
     		response = firebase.set("locations/drivers/3/",{:lat => lat[3], :long => long[3] })
-    		lat[3] = lat[3] - 0.00002
+    		lat[3] = lat[3] - 0.000002
     		response = firebase.set("locations/drivers/4/",{:lat => lat[4], :long => long[4] })
-    		lat[4] = lat[4] + 0.00002
+    		lat[4] = lat[4] + 0.000002
 
     	end
     	return render :json => "Success"
