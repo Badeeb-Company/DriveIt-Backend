@@ -164,18 +164,23 @@ class TripHandler
 		# self.invite_driver(driver)
 		# end
 	def invite_driver(driver)
-		firebase = Firebase::Client.new(Rails.application.secrets.FIR_Base_URL)
-		@trip.driver_id = driver.id
-		@trip.trip_state = Trip.trip_states[:PENDING]
-		driver.driver_state = Driver.driver_states[:INVITED]
-		driver.save
-		@trip.save
-    	response = firebase.set("drivers/#{driver.id}/trip/", self.driver_data(driver))
-    	response = firebase.set("clients/#{@trip.user.id}/trip/",self.client_data(driver))
-    	unless response.success?
-      		@trip.errors.add(:firebase, "Cannot save record")
-      		return false
-      	end
+		@trip = Trip.find(@trip.id)
+		if @trip.trip_state == Trip.trip_states[:PENDING]
+			firebase = Firebase::Client.new(Rails.application.secrets.FIR_Base_URL)
+			@trip.driver_id = driver.id
+			@trip.trip_state = Trip.trip_states[:PENDING]
+			driver.driver_state = Driver.driver_states[:INVITED]
+			driver.save
+			@trip.save
+			response = firebase.set("drivers/#{driver.id}/trip/", self.driver_data(driver))
+			response = firebase.set("clients/#{@trip.user.id}/trip/",self.client_data(driver))
+			unless response.success?
+				@trip.errors.add(:firebase, "Cannot save record")
+				return false
+			end
+		else
+			return false
+		end
 	end
 
 	def driver_accepted(driver)
