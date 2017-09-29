@@ -39,12 +39,10 @@ class TripHandler
 		return {:distance_to_arrive => @driver_dict[:distance][:distance],:client_address => @trip.destination, :client_id => @trip.user.id, :client_phone => @trip.user.phone, :client_image_url => @trip.user.image_url, :client_long => @trip.long, :client_lat => @trip.lat,:client_name => @trip.user.name, :client_phone => @trip.user.phone, :id => @trip.id, :state => Trip.trip_states.keys[@trip.trip_state],:time_to_arrive => @driver_dict[:distance][:time]}
 	end
 	def set_driver_dict(driver)
-		p "Drivers count = #{@fir_drivers.count}"
+		
 		@fir_drivers.each do |driver_dict|
-			p "Checking driver dict #{driver_dict}"
-			if driver_dict[:id].to_i == driver.id
+			if driver_dict[:id].to_i == driver.id.to_i
 				@driver_dict = driver_dict
-				p @driver_dict
 				return
 			end
 		end
@@ -86,19 +84,20 @@ class TripHandler
 		while not @index >= @fir_drivers.count
 
 			@driver_dict = @fir_drivers[@index]
-			p "Driver Dict #{@driver_dict}"
+			Rails.logger.info("Driver Dict #{@driver_dict}")
 			driver_id = @fir_drivers[@index][:id].to_i
-			p "Driver ID = #{driver_id}"
+			Rails.logger.info("Driver ID = #{driver_id}")
 			driver = Driver.where(id: driver_id, :driver_state => Driver.driver_states[:AVAILABLE], :driver_availability => Driver.driver_avilabilities[:ONLINE]).first
-			p "Driver #{driver}"
-			p "Invit Driver #{driver}"
+			Rails.logger.info("Will check Driver #{driver.id}")
 			if driver.present?
+				Rails.logger.info("Will invite Driver #{driver.id}")
 				invite_driver(driver)
 				delay(run_at: Rails.application.secrets.driver_timeout.seconds.from_now).invalidate_driver(driver)
 				@trip.index = @index 
 				@trip.save
 				return
 			end
+			Rails.logger.info("Driver with id =#{driver.id} can't be invited")
 			@index = @index + 1
 			@trip.index = @index 
 			@trip.save
