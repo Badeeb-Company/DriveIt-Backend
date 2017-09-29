@@ -34,7 +34,7 @@ module Api
 			header :Authorization, 'Access Token', :required => true
 			error STATUS_ERROR, "Server Error Message"
 			error STATUS_NotFound, "Trip Not Found"
-			error STATUS_BAD_REQUEST, "Error Message"
+			error STATUS_UNPROCESSABEL, "Error Message"
 			meta :meta => {:status => STATUS_SUCCESS, :message => "Trip Rejected"}			
 			def reject_trip
 				if current_driver.blank?
@@ -42,9 +42,14 @@ module Api
 				end
 				@trip = Trip.where(:id => params[:trip_id].to_i).first
 				return render :status => STATUS_NotFound, :json => {:meta => {:status => STATUS_NotFound, :message => "Trip not found"}} if @trip.blank?
-				handler = TripHandler.new(@trip)
-				handler.driver_rejected(current_driver,false)
-				return render :status => STATUS_SUCCESS, :json => {:meta => {:status => STATUS_SUCCESS, :message => "Trip Rejected"}}
+				if @trip.trip_state = Trip.trip_states[:PENDING] && @trip.driver_id == current_driver.id
+					handler = TripHandler.new(@trip)
+					handler.driver_rejected(current_driver,false)
+					return render :status => STATUS_SUCCESS, :json => {:meta => {:status => STATUS_SUCCESS, :message => "Trip Rejected"}}
+				else
+					return render :status => STATUS_UNPROCESSABEL, :json => {:meta => {:status => STATUS_UNPROCESSABEL, :message => "unprocessable_entity"}}
+				end
+
 			end
 
 			api :POST, "/api/v1/trip/:trip_id/accept", "Accept Trip (Driver side)"
@@ -52,7 +57,7 @@ module Api
 			header :Authorization, 'Access Token', :required => true
 			error STATUS_ERROR, "Server Error Message"
 			error STATUS_NotFound, "Trip Not Found"
-			error STATUS_BAD_REQUEST, "Error Message"
+			error STATUS_UNPROCESSABEL, "Error Message"
 			meta :meta => {:status => STATUS_SUCCESS, :message => "Trip Accepted"}, :trip => "Integer"
 			def accept_trip
 				if current_driver.blank?
@@ -60,10 +65,14 @@ module Api
 				end
 				@trip = Trip.where(:id => params[:trip_id].to_i).first
 				return render :status => STATUS_NotFound, :json => {:meta => {:status => STATUS_NotFound, :message => "Trip not found"}} if @trip.blank?
-				handler = TripHandler.new(@trip)
-				p "Current Driver #{current_driver}"
-				handler.driver_accepted(current_driver)
-				return render :status => STATUS_SUCCESS, :json => {:meta => {:status => STATUS_SUCCESS, :message => "Trip Accepted"}, :trip => @trip.id}
+				if @trip.trip_state = Trip.trip_states[:PENDING] && @trip.driver_id == current_driver.id
+					handler = TripHandler.new(@trip)
+					p "Current Driver #{current_driver}"
+					handler.driver_accepted(current_driver)
+					return render :status => STATUS_SUCCESS, :json => {:meta => {:status => STATUS_SUCCESS, :message => "Trip Accepted"}, :trip => @trip.id}
+				else
+					return render :status => STATUS_UNPROCESSABEL, :json => {:meta => {:status => STATUS_UNPROCESSABEL, :message => "unprocessable_entity"}}
+				end
 			end
 
 			api :POST, "/api/v1/trip/:trip_id/cancel", "Cancel Trip (Client side)"

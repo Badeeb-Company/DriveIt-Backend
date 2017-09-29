@@ -9,7 +9,7 @@ class TripHandler
 		load_drivers
 	end
 	def load_drivers
-		@trip.trip_drivers.each do |driver|
+		@trip.trip_drivers.order(id: :ASC).each do |driver|
 			driver_dict = Hash.new()
 			driver_dict[:id] = driver.driver_id
 			driver_dict[:distance] = Hash.new
@@ -39,12 +39,10 @@ class TripHandler
 		return {:distance_to_arrive => @driver_dict[:distance][:distance],:client_address => @trip.destination, :client_id => @trip.user.id, :client_phone => @trip.user.phone, :client_image_url => @trip.user.image_url, :client_long => @trip.long, :client_lat => @trip.lat,:client_name => @trip.user.name, :client_phone => @trip.user.phone, :id => @trip.id, :state => Trip.trip_states.keys[@trip.trip_state],:time_to_arrive => @driver_dict[:distance][:time]}
 	end
 	def set_driver_dict(driver)
-		p "Drivers count = #{@fir_drivers.count}"
+		
 		@fir_drivers.each do |driver_dict|
-			p "Checking driver dict #{driver_dict}"
-			if driver_dict[:id].to_i == driver.id
+			if driver_dict[:id].to_i == driver.id.to_i
 				@driver_dict = driver_dict
-				p @driver_dict
 				return
 			end
 		end
@@ -86,21 +84,26 @@ class TripHandler
 		while not @index >= @fir_drivers.count
 
 			@driver_dict = @fir_drivers[@index]
-			p "Driver Dict #{@driver_dict}"
+			Rails.logger.info("Driver Dict #{@driver_dict}")
 			driver_id = @fir_drivers[@index][:id].to_i
-			p "Driver ID = #{driver_id}"
+			Rails.logger.info("Driver ID = #{driver_id}")
 			driver = Driver.where(id: driver_id, :driver_state => Driver.driver_states[:AVAILABLE], :driver_availability => Driver.driver_avilabilities[:ONLINE]).first
-			p "Driver #{driver}"
-			p "Invit Driver #{driver}"
+			Rails.logger.info("Will check Driver #{driver.id}")
 			if driver.present?
+				Rails.logger.info("Will invite Driver #{driver.id}")
 				invite_driver(driver)
 				delay(run_at: Rails.application.secrets.driver_timeout.seconds.from_now).invalidate_driver(driver)
 				@trip.index = @index 
 				@trip.save
 				return
 			end
+			Rails.logger.info("Driver with id =#{driver.id} can't be invited")
 			@index = @index + 1
+			@trip.index = @index 
+			@trip.save
 		end
+		@trip.index = @index 
+		@trip.save
 		p 'No Driver Avilable'
 		not_served()
 	end
@@ -161,18 +164,23 @@ class TripHandler
 		# self.invite_driver(driver)
 		# end
 	def invite_driver(driver)
-		firebase = Firebase::Client.new(Rails.application.secrets.FIR_Base_URL)
-		@trip.driver_id = driver.id
-		@trip.trip_state = Trip.trip_states[:PENDING]
-		driver.driver_state = Driver.driver_states[:INVITED]
-		driver.save
-		@trip.save
-    	response = firebase.set("drivers/#{driver.id}/trip/", self.driver_data(driver))
-    	response = firebase.set("clients/#{@trip.user.id}/trip/",self.client_data(driver))
-    	unless response.success?
-      		@trip.errors.add(:firebase, "Cannot save record")
-      		return false
-      	end
+		@trip = Trip.find(@trip.id)
+		if @trip.trip_state == Trip.trip_states[:PENDING]
+			firebase = Firebase::Client.new(Rails.application.secrets.FIR_Base_URL)
+			@trip.driver_id = driver.id
+			# @trip.trip_state = Trip.trip_states[:PENDING]
+			driver.driver_state = Driver.driver_states[:INVITED]
+			driver.save
+			@trip.save
+			response = firebase.set("drivers/#{driver.id}/trip/", self.driver_data(driver))
+			response = firebase.set("clients/#{@trip.user.id}/trip/",self.client_data(driver))
+			unless response.success?
+				@trip.errors.add(:firebase, "Cannot save record")
+				return false
+			end
+		else
+			return false
+		end
 	end
 
 	def driver_accepted(driver)
@@ -209,7 +217,9 @@ class TripHandler
       		@trip.errors.add(:firebase, "Cannot save record")
       		return false
       	end
-      	@index = @index + 1
+      	@index = @trip.index + 1
+      	@trip.index = @index
+      	@trip.save
       	choose_driver
 	end
 
