@@ -100,7 +100,11 @@ class TripHandler
 				return
 			end
 			@index = @index + 1
+			@trip.index = @index 
+			@trip.save
 		end
+		@trip.index = @index 
+		@trip.save
 		p 'No Driver Avilable'
 		not_served()
 	end
@@ -209,7 +213,9 @@ class TripHandler
       		@trip.errors.add(:firebase, "Cannot save record")
       		return false
       	end
-      	@index = @index + 1
+      	@index = @trip.index + 1
+      	@trip.index = @index
+      	@trip.save
       	choose_driver
 	end
 
