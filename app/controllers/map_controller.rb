@@ -8,7 +8,7 @@ class MapController < ApplicationController
 	end
 
 	def driver_available
-		driver = Driver.where(params[:id]).first
+		driver = Driver.where(params[:id].to_i).first
 		if driver.present?
 			driver.driver_state = Driver.driver_states[:AVAILABLE]
 			driver.save
