@@ -15,28 +15,11 @@
     </div>
   </div>
 
-  <% if devise_mapping.rememberable? -%>
-    <div class="form-group">
-      <div class="col-sm-offset-2 col-sm-10">
-        <div class="checkbox">
-          <label>
-            <%= f.check_box :remember_me %>
-            <%= f.label :remember_me %>
-          </label>
-        </div>
-      </div>
-    </div>
-  <% end -%>
-
   <div class="form-group">
     <div class="col-sm-offset-2 col-sm-10">
       <%= f.submit "Log in", class: "btn btn-default" %>
     </div>
   </div>
 
-  <div class="form-group">
-    <div class="col-sm-offset-2 col-sm-6">
-      <%= render "devise/shared/links" %>
-    </div>
-  </div>
+
 <% end %>

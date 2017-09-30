@@ -11,27 +11,44 @@
         height: 400px;
         width: 100%;
       }
-     
+     p {margin-top: 20px;}
+     table, tr,th, td {
+      text-align:center;
+      vertical-align: middle;
+    }
     </style>
   </head>
   <body>
     <div id="map"></div>
     <div></div>
-    <div id="AllDrivers"> <button type="button">Show All</button> </div>
+    <div id="AllDrivers", margin = 10 10 10 10> <p></p><button class="btn btn-primary" type="button">Show All</button> </div>
     <div id="drivers"><h3>Drivers</h3></div>
-    <table class="table table-striped table-bordered table-hover", id="table", table_layout="fixed">
-      <thead >
-      <tr text-align="center">
-        <th >ID</th>
-        <th >Name</th>
-        <th> Phone </th>
+    <table class="table table-striped table-bordered", id="table", table_layout="fixed">
+        
+      <thead class="thead-inverse">
+      <tr>
+        <th>#</th>
+        <th>Name</th>
+        <th>Phone</th>
         <th>Availability</th>
         <th>State</th>
-        <!-- <th></th> -->
+        <th>Track</th>
       </tr>
     </thead>
-      <%= render @drivers %>
+    <tbody>
+    <% for driver in @drivers_table %>
+       <tr>
+        <th> <%= driver.id %> </th>
+        <th><%= driver.name %></th>
+        <th> <%= driver.phone %> </th>
+        <th><%= driver.availability_string%></th>
+        <th><%= driver.state_string %></th>
+        <td ><button class="btn btn-info" id= <%=driver.id%>>Track</button></td>
+      </tr>
+    <% end %>
+    </tbody>
     </table>
+    <%= will_paginate @drivers_table %>
     <script>
     // ...
 
@@ -43,10 +60,19 @@
       var map;
       var markers = {}
       var tracked_marker;
+      $('.btn').click(function(ev){
+        var driver_id = ev.target.id
+        var bounds = new google.maps.LatLngBounds();
+        var marker = markers[driver_id]
+        bounds.extend(marker.getPosition());
+        map.panTo(marker.getPosition());
+        tracked_marker = marker
+    });
       function trackDrivers(){
         console.log('trackDrivers')
       };
       document.getElementById('AllDrivers').addEventListener("click", function(){
+          tracked_marker = null;
           var bounds = new google.maps.LatLngBounds();
           for (var marker_id in markers) {
               var marker = markers[marker_id]
@@ -128,11 +154,9 @@
                 var driver = "Not find"
                 <% @drivers.each do |driver| %>
                   if (<%=driver.id%> == marker.title){
-                    // alert('A7A')
                     if (current_info_window != null){
                       current_info_window.close()
                     }
-                    tracked_marker = marker
                     var infowindow = new google.maps.InfoWindow({
                       content: "<p>" +"<%=driver.name%>" + "<br />" + "<%=driver.availability_string%>" + "<br />" + "<%= driver.state_string%>" + "</p>"
                     });
@@ -150,7 +174,6 @@
                   var drivers = "<%= @drivers%>"
                   var driversCount = drivers.length
                   var driver = "Not found"
-                  tracked_marker = marker
                   <% @drivers.each do |driver| %>
                     if (<%=driver.id%> == marker.title){
                     if (current_info_window != null){
@@ -176,11 +199,9 @@
           var val = snapshot.val()
           var position = new google.maps.LatLng(val["lat"],val["long"])
           var marker = markers[driver_id]
-          // if (marker.title == tracked_marker.title){
-          //   var bounds = new google.maps.LatLngBounds();
-          //   bounds.extend(marker.getPosition());
-          //   map.fitBounds(bounds);
-          // }
+          if (tracked_marker != null && marker.title == tracked_marker.title){
+            map.panTo(marker.getPosition());
+          }
           marker.setPosition(position)          
           markers[driver_id] = marker
           }else{
