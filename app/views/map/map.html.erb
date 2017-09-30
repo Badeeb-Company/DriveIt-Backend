@@ -47,7 +47,7 @@
         <% if driver.state_string == "Available" %>
           <td> <button class="btn btn-success" id= "AllDrivers" disabled="true">Available</button>
         <%else%>
-          <td> <button class="btn btn-success" id= "AllDrivers" onclick="location.href='/map/driver_available?id/<%=driver.id%>';">Available</button>
+          <td> <button class="btn btn-success" id= "AllDrivers" onclick="location.href='/map/driver_available?id=/<%=driver.id%>';">Available</button>
         <%end%>
       </tr>
     <% end %>
