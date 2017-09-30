@@ -10,7 +10,12 @@ gem 'apipie-rails'
 
 gem 'net-ssh'
 
+# Use jquery as the JavaScript library
+gem 'jquery-rails'
+gem 'jbuilder', '~> 2.5'
 
+# paperclip
+gem 'paperclip', '4.3.5'
 
 gem 'firebase'
 # Running jobs in the background
