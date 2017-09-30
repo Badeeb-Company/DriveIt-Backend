@@ -32,6 +32,7 @@
         <th>Availability</th>
         <th>State</th>
         <th>Track</th>
+        <th></th>
       </tr>
     </thead>
     <tbody>
@@ -43,6 +44,11 @@
         <th><%= driver.availability_string%></th>
         <th><%= driver.state_string %></th>
         <td ><button class="btn btn-info" id= <%=driver.id%>>Track</button></td>
+        <% if driver.state_string == "Available" %>
+          <td> <button class="btn btn-success" id= "AllDrivers" disabled="true">Available</button>
+        <%else%>
+          <td> <button class="btn btn-success" id= "AllDrivers" onclick="location.href='/map/driver_available?id/<%=driver.id%>';">Available</button>
+        <%end%>
       </tr>
     <% end %>
     </tbody>

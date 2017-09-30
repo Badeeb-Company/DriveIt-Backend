@@ -5,6 +5,7 @@ Rails.application.routes.draw do
   apipie
   post "reset_trip", :to => "application#reset_trip"
   get "test_google_api", :to => "application#test_google_api"
+  get "map/driver_available", :to => "map#driver_available"
   # root :to => "apipie/apipies#index"
   root :to => "map#map"
   get "map", :to => "map#map"

@@ -46,10 +46,10 @@ class Driver < ApplicationRecord
     end
   end
   def state_string
-    if self.driver_state == Driver.driver_states[:AVAILABLE]
-      return "Available"
-    else
+    if self.driver_state == Driver.driver_states[:IN_TRIP]
       return "Busy"
+    else
+      return "Available"
     end
   end
   private 
