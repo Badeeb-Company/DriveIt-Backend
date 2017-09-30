@@ -21,7 +21,7 @@
   <body>
     <div id="map"></div>
     <div></div>
-    <div id="AllDrivers", margin = 10 10 10 10> <p></p><button class="btn btn-primary" type="button">Show All</button> </div>
+    <div id="AllDrivers", margin = 10 10 10 10> <p></p><button class="btn btn-primary" type="button" id="AllDrivers">Show All</button> </div>
     <div id="drivers"><h3>Drivers</h3></div>
   <table class="table table-striped">      
       <thead >
@@ -47,7 +47,7 @@
     <% end %>
     </tbody>
     </table>
-    <%= will_paginate @drivers_table %>
+    <%= will_paginate @drivers_table, renderer: BootstrapPagination::Rails%>
     <script>
     // ...
 
@@ -61,16 +61,23 @@
       var tracked_marker;
       $('.btn').click(function(ev){
         var driver_id = ev.target.id
-        var bounds = new google.maps.LatLngBounds();
-        var marker = markers[driver_id]
-        bounds.extend(marker.getPosition());
-        map.panTo(marker.getPosition());
-        tracked_marker = marker
+        if (driver_id != 'AllDrivers') {
+          var marker = markers[driver_id]
+          if (marker == null){
+            alert("Driver doesn't have location")
+          }else{
+            var bounds = new google.maps.LatLngBounds();
+            bounds.extend(marker.getPosition());
+            map.panTo(marker.getPosition());
+            tracked_marker = marker
+          }
+        }
     });
       function trackDrivers(){
         console.log('trackDrivers')
       };
       document.getElementById('AllDrivers').addEventListener("click", function(){
+        console.log('All Drivers')
           tracked_marker = null;
           var bounds = new google.maps.LatLngBounds();
           for (var marker_id in markers) {
