@@ -1,0 +1,23 @@
+<div class="page-header">
+	<h1>Import Products</h1>
+</div>
+
+<%= form_tag do_import_products_path, multipart: true, :class => "form-horizontal" do %>
+
+<div class="form-group">
+	<%= label_tag :file, 'Choose file', :class => 'control-label col-lg-2' %>
+	<div class="col-lg-10">
+		<%= file_field_tag :file, accept: 'application/zip, application/octet-stream' %>
+	</div>
+</div>
+
+<div class="form-group">
+	<div class="col-lg-offset-2 col-lg-10">
+		<%= submit_tag 'Import', :class => 'btn btn-primary'%>
+		<%= link_to t('.cancel', :default => t("helpers.links.cancel")),
+		products_path, :class => 'btn btn-default' %>
+	</div>
+</div>
+
+
+<% end %>

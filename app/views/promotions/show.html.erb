@@ -1,0 +1,58 @@
+<%- model_class = Promotion -%>
+<div class="page-header">
+  <h1><%=t '.title', :default => model_class.model_name.human.titleize %></h1>
+</div>
+
+<dl class="dl-horizontal">
+  <dt><strong><%= model_class.human_attribute_name(:title) %>:</strong></dt>
+  <dd><%= @promotion.title %></dd>
+  <dt><strong><%= model_class.human_attribute_name(:description) %>:</strong></dt>
+  <dd><%= @promotion.description %></dd>
+  <dt><strong><%= model_class.human_attribute_name(:due_date) %>:</strong></dt>
+  <dd><%= @promotion.due_date %></dd>
+  <dt><strong><%= model_class.human_attribute_name(:dynamic_link) %>:</strong></dt>
+  <dd><%= @promotion.dynamic_link %></dd>
+</dl>
+
+<div class="row">
+<div class="col-lg-offset-2 col-lg-10 auto-width">
+    <div id="promotion_photos-carousel" class="carousel slide bottom-15" data-ride="carousel">
+
+      <!-- Wrapper for slides -->
+      <div class="carousel-inner" role="listbox">
+        <% @promotion.photos.each_with_index do |photo, i| %>
+
+        <div class="item <%= 'active' if i == 0 %>">
+          <img src="<%= photo.photo_url %>" alt="<%= photo.photo_identifier %>" class="thumb">
+          <div class="carousel-caption">
+            <h4><%= photo.photo_identifier %></h4>
+          </div>
+        </div>
+
+        <% end %>
+      </div>
+
+      <!-- Controls -->
+      <a class="left carousel-control" href="#promotion_photos-carousel" role="button" data-slide="prev">
+        <span class="glyphicon glyphicon-chevron-left" aria-hidden="true"></span>
+        <span class="sr-only">Previous</span>
+      </a>
+      <a class="right carousel-control" href="#promotion_photos-carousel" role="button" data-slide="next">
+        <span class="glyphicon glyphicon-chevron-right" aria-hidden="true"></span>
+        <span class="sr-only">Next</span>
+      </a>
+    </div>
+  </div>
+</div>
+
+<div class="form-group">
+  <%= link_to t('.back', :default => t("helpers.links.back")),
+  promotions_path, :class => 'btn btn-default'  %>
+  <%= link_to t('.edit', :default => t("helpers.links.edit")),
+  edit_promotion_path(@promotion), :class => 'btn btn-default' %>
+  <%= link_to t('.destroy', :default => t("helpers.links.destroy")),
+  promotion_path(@promotion),
+  :method => 'delete',
+  :data => { :confirm => t('.confirm', :default => t("helpers.links.confirm", :default => 'Are you sure?')) },
+  :class => 'btn btn-danger' %>
+</div>

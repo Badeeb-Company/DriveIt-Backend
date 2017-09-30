@@ -1,0 +1,86 @@
+<%= form_for @promotion, :html => { :class => "form-horizontal promotion" } do |f| %>
+
+<% if @promotion.errors.any? %>
+<div id="error_expl" class="panel panel-danger">
+  <div class="panel-heading">
+    <h3 class="panel-title"><%= pluralize(@promotion.errors.count, "error") %> prohibited this promotion from being saved:</h3>
+  </div>
+  <div class="panel-body">
+    <ul>
+      <% @promotion.errors.full_messages.each do |msg| %>
+      <li><%= msg %></li>
+      <% end %>
+    </ul>
+  </div>
+</div>
+<% end %>
+
+<div class="form-group">
+  <%= f.label :title, :class => 'control-label col-lg-2' %>
+  <div class="col-lg-10">
+    <%= f.text_field :title, :class => 'form-control' %>
+  </div>
+  <%=f.error_span(:title) %>
+</div>
+
+<div class="form-group">
+  <%= f.label :description, :class => 'control-label col-lg-2' %>
+  <div class="col-lg-10">
+    <%= f.text_area :description, :class => 'form-control', :rows => 4 %>
+  </div>
+  <%=f.error_span(:description) %>
+</div>
+
+<div class="form-group">
+  <%= f.label :due_date, :class => 'control-label col-lg-2' %>
+  <div class="col-lg-10">
+    <%= f.date_select :due_date, :class => 'form-control' %>
+  </div>
+  <%=f.error_span(:due_date) %>
+</div>
+
+<div class="form-group">
+  <%= f.label :dynamic_link, :class => 'control-label col-lg-2' %>
+  <div class="col-lg-10">
+    <%= f.text_field :dynamic_link, readonly: true, :class => 'form-control' %>
+  </div>
+</div>
+
+<div class="form-group">
+  <%= f.label 'Import vendors', :class => 'control-label col-lg-2' %>
+  <div class="col-lg-10">
+    <%= f.file_field :file, accept: 'application/vnd.ms-excel, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' %>
+  </div>
+</div>
+
+
+<div class="form-group">
+  <%= f.label 'photos', :class => 'control-label col-lg-2' %>
+
+  <%= f.fields_for :photos do |photo| %>
+    <%= render 'photo_fields', f: photo %>
+  <% end %>
+</div>
+
+
+<div class="form-group">
+  <div class="links col-lg-offset-2 col-lg-10 top-30">
+    <%= link_to_add_association 'Add New Photo', f, :photos, 
+    :class => 'btn btn-default' %>
+    <% if !f.object.new_record? %>
+      <%= link_to 'Edit Vendors', promotion_vendors_path(f.object), :class => 'btn btn-default' %>
+    <% end %>
+
+  </div>
+</div>
+
+<div class="form-group">
+  <div class="col-lg-offset-2 col-lg-10">
+    <%= f.submit nil, :class => 'btn btn-primary' %>
+    <%= link_to t('.cancel', :default => t("helpers.links.cancel")),
+    promotions_path, :class => 'btn btn-default' %>
+  </div>
+</div>
+
+<% end %>
+
