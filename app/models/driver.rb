@@ -7,6 +7,7 @@ class Driver < ApplicationRecord
 
   enum driver_states: [:AVAILABLE, :IN_TRIP, :INVITED]
   enum driver_avilability: [:ONLINE, :OFFLINE]
+  enum driver_types:[:CAR, :BIKE]
   validates_uniqueness_of :phone
 
   before_create :generate_access_token
