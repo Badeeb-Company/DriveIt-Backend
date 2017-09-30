@@ -56,6 +56,7 @@ class Driver < ApplicationRecord
   def generate_access_token
   	self.token = Devise.friendly_token(length = 100)
   	self.driver_state = Driver.driver_states[:AVAILABLE]
+    self.driver_availability = Driver.driver_avilabilities[:OFFLINE]
   end
 
 end
