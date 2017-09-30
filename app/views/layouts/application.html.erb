@@ -1,92 +1,66 @@
 <!DOCTYPE html>
-<html lang="en">
-  <head>
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=Edge,chrome=1">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Waritex Promotions</title>
-    <%= csrf_meta_tags %>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="">
+  <meta name="author" content="">
+  <title>Starter Template for Bootstrap</title>
 
-    <%= stylesheet_link_tag "application", :media => "all" %>
+  <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
+  <!--[if lt IE 9]>
+    <%= javascript_include_tag "https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js", "https://oss.maxcdn.com/respond/1.4.2/respond.min.js" %>
+  <![endif]-->
 
-    <!-- For third-generation iPad with high-resolution Retina display: -->
-    <!-- Size should be 144 x 144 pixels -->
-    <%= favicon_link_tag 'apple-touch-icon-144x144-precomposed.png', :rel => 'apple-touch-icon-precomposed', :type => 'image/png', :sizes => '144x144' %>
-
-    <!-- For iPhone with high-resolution Retina display: -->
-    <!-- Size should be 114 x 114 pixels -->
-    <%= favicon_link_tag 'apple-touch-icon-114x114-precomposed.png', :rel => 'apple-touch-icon-precomposed', :type => 'image/png', :sizes => '114x114' %>
-
-    <!-- For first- and second-generation iPad: -->
-    <!-- Size should be 72 x 72 pixels -->
-    <%= favicon_link_tag 'apple-touch-icon-72x72-precomposed.png', :rel => 'apple-touch-icon-precomposed', :type => 'image/png', :sizes => '72x72' %>
-
-    <!-- For non-Retina iPhone, iPod Touch, and Android 2.1+ devices: -->
-    <!-- Size should be 57 x 57 pixels -->
-    <%= favicon_link_tag 'apple-touch-icon-precomposed.png', :rel => 'apple-touch-icon-precomposed', :type => 'image/png' %>
-
-    <!-- For all other devices -->
-    <!-- Size should be 32 x 32 pixels -->
-    <%= favicon_link_tag 'favicon.ico', :rel => 'shortcut icon' %>
-
-    <%= javascript_include_tag "application" %>
-
-
-    <!-- Le HTML5 shim, for IE6-8 support of HTML elements -->
-    <!--[if lt IE 9]>
-    <script src="//cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.2/html5shiv.min.js" type="text/javascript"></script>
-    <![endif]-->
-  </head>
-  <body>
-
-    <div class="navbar navbar-default navbar-static-top">
-      <div class="container">
-
-        
-        <button type="button" class="navbar-toggle" data-toggle="collapse" 
-            data-target=".navbar-responsive-collapse">
-          <span class="icon-bar"></span>
-          <span class="icon-bar"></span>
-          <span class="icon-bar"></span>
-        </button>
-
-        <%= link_to image_tag('company_logo.png'), :promotions, class: "navbar-left", padding: '10px'  %>
-
-        <div class="navbar-collapse collapse navbar-responsive-collapse">
-
-          <% if user_signed_in? %>        
-          <ul class="nav navbar-nav">
-            <li><%= link_to "Promotions", :promotions  %></li>
-            <li><%= link_to "Products", :products  %></li>
-            <li><%= link_to "Settings", :settings  %></li>
-            <li><%= link_to "Notifications", :notifications  %></li>
-          </ul>
-          <% end %>
-
-          <% if user_signed_in? %>
-            <ul class="nav navbar-nav navbar-right">
-              <li><%= link_to "Sign out", destroy_user_session_path, :method => :delete %></li>
-            </ul>
-          <% end %>
-
-        </div>
-      </div>
-    </div>
-
+  <%= stylesheet_link_tag    'application', media: 'all', 'data-turbolinks-track' => true %>
+  <%= javascript_include_tag 'application', 'data-turbolinks-track' => true %>
+  <%= javascript_include_tag 'jquery.tablednd.js', 'jquery.tablednd.0.8.min.js' %>
+  <%= csrf_meta_tags %>
+</head>
+<body>
+  <nav class="navbar navbar-inverse navbar-fixed-top" role="navigation">
     <div class="container">
-
-      <div class="row">
-        <div class="col-lg-12">
-          <%= bootstrap_flash %>
-          <%= yield %>
+      <div id="navbar" class="">
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" aria-expanded="false" aria-controls="navbar">
+            <span class="sr-only">Toggle navigation</span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <%= link_to "DriveIt", "/", class: "navbar-brand" %>
         </div>
-      </div><!--/row-->
+        <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
 
-      <footer>
-        <p>&copy; Company 2017</p>
-      </footer>
+        <ul class="nav navbar-nav">
+          <li class="<%= 'active' if params[:controller] == 'map' %>"><a href="/">Map</a></li>
+        </ul>
+        <ul class="nav navbar-nav navbar-right">
+          <% if admin_signed_in? %>
+            <li class="dropdown">
+              <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false"><%= current_admin.email %> <span class="caret"></span></a>
+              <ul class="dropdown-menu">
+                <li><%= link_to 'Profile', edit_admin_registration_path %></li>
+                <li><%= link_to 'Log out', destroy_admin_session_path, method: :delete %></li>
+              </ul>
+            </li>
+           <% else %>
+            <li><%= link_to 'Log In', new_admin_session_path %></li>
+          <% end %>
+        </ul>
+        </div>
+    </div>
+  </nav>
+  <div class="container">
+    <% flash.each do |name, msg| %>
+      <%= content_tag :div, class: "alert alert-#{ name == :error ? "danger" : "success" } alert-dismissable", role: "alert" do %>
+        <button type="button" class="close" data-dismiss="alert"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+        <%= msg %>
+      <% end %>
+    <% end %>
 
-    </div> <!-- /container -->
-
-  </body>
+    <%= yield %>
+  </div>
+</body>
 </html>
