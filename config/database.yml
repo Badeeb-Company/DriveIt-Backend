@@ -22,7 +22,7 @@ default: &default
   # username: mostafa
   # password: root
 #  socket: /tmp/mysql.sock
-
+host: localhost
 development:
   <<: *default
   database: DriveIt_development

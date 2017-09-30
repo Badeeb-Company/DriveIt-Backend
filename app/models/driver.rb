@@ -30,9 +30,28 @@ class Driver < ApplicationRecord
 	  	options[:except] ||= [:token]
 	  end
 	   json = super(options)
+     if options[:html] == true
+        return json.to_json.html_safe
+      end
      return json
   end  
-
+  def map_description
+    return "Name: #{self.name}, Phone: #{self.phone}, Availability: #{Driver.driver_avilabilities.keys[self[:driver_availability]]}, State: #{Driver.driver_states.keys[self[:driver_state]]}".html_safe
+  end
+  def availability_string
+    if self.driver_availability == Driver.driver_avilabilities[:ONLINE]
+      return "Online"
+    else
+      return "Offline"
+    end
+  end
+  def state_string
+    if self.driver_state == Driver.driver_states[:AVAILABLE]
+      return "Available"
+    else
+      return "Busy"
+    end
+  end
   private 
   def generate_access_token
   	self.token = Devise.friendly_token(length = 100)

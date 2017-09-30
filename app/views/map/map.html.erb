@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html>
+  <head>
+      <script src='https://cdn.firebase.com/js/client/2.4.0/firebase.js'></script>
+    <title>Custom Legend</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <meta charset="utf-8">
+    <style>
+     
+      #map {
+        height: 400px;
+        width: 100%;
+      }
+     p {margin-top: 20px;}
+     table, tr,th, td {
+      text-align:center;
+      vertical-align: middle;
+    }
+    </style>
+  </head>
+  <body>
+    <div id="map"></div>
+    <div></div>
+    <div id="AllDrivers", margin = 10 10 10 10> <p></p><button class="btn btn-primary" type="button">Show All</button> </div>
+    <div id="drivers"><h3>Drivers</h3></div>
+    <table class="table table-striped table-bordered", id="table", table_layout="fixed">
+        
+      <thead class="thead-inverse">
+      <tr>
+        <th>#</th>
+        <th>Name</th>
+        <th>Phone</th>
+        <th>Availability</th>
+        <th>State</th>
+        <th>Track</th>
+      </tr>
+    </thead>
+    <tbody>
+    <% for driver in @drivers_table %>
+       <tr>
+        <th> <%= driver.id %> </th>
+        <th><%= driver.name %></th>
+        <th> <%= driver.phone %> </th>
+        <th><%= driver.availability_string%></th>
+        <th><%= driver.state_string %></th>
+        <td ><button class="btn btn-info" id= <%=driver.id%>>Track</button></td>
+      </tr>
+    <% end %>
+    </tbody>
+    </table>
+    <%= will_paginate @drivers_table %>
+    <script>
+    // ...
+
+
+  </script>
+    <script>
+      // 'https://driveit-e768a.firebaseio.com/development/locations/drivers/'
+      var myFirebase = new Firebase("<%= "#{Rails.application.secrets.FIR_Base_URL}locations/drivers"%>");
+      var map;
+      var markers = {}
+      var tracked_marker;
+      $('.btn').click(function(ev){
+        var driver_id = ev.target.id
+        var bounds = new google.maps.LatLngBounds();
+        var marker = markers[driver_id]
+        bounds.extend(marker.getPosition());
+        map.panTo(marker.getPosition());
+        tracked_marker = marker
+    });
+      function trackDrivers(){
+        console.log('trackDrivers')
+      };
+      document.getElementById('AllDrivers').addEventListener("click", function(){
+          tracked_marker = null;
+          var bounds = new google.maps.LatLngBounds();
+          for (var marker_id in markers) {
+              var marker = markers[marker_id]
+              bounds.extend(marker.getPosition());
+          }
+          map.fitBounds(bounds);
+      });
+
+
+      function initMap() {
+        map = new google.maps.Map(document.getElementById('map'), {
+          zoom: 6,
+          center: new google.maps.LatLng(28.94, 31.244723),
+          mapTypeId: 'roadmap'
+        });
+
+        var iconBase = 'https://maps.google.com/mapfiles/kml/shapes/';
+        var icons = {
+          parking: {
+            name: 'Parking',
+            icon: iconBase + 'parking_lot_maps.png'
+          },
+          library: {
+            name: 'Library',
+            icon: iconBase + 'library_maps.png'
+          },
+          car: {
+            name: 'Car',
+            // icon: iconBase + 'info-i_maps.png'
+            icon: '/assets/car.png'
+          }
+        };
+        /** Function to add a data listener **/
+
+    var startListening = function() {
+      myFirebase.once('value', function(snapshot) {
+        var drivers = snapshot.val()
+        var bounds = new google.maps.LatLngBounds();
+        for (var driver_id in drivers) {
+          if (parseInt(driver_id)) {
+              if (markers[driver_id] == null) {
+                var val = drivers[driver_id]
+                var position = new google.maps.LatLng(val["lat"],val["long"])
+                var marker = new google.maps.Marker({
+                    position: position,
+                    icon: icons['car'].icon,
+                    title: driver_id,
+                    map: map
+                    
+                });
+                marker.setMap(map)
+                bounds.extend(marker.getPosition());
+                markers[driver_id] = marker
+              }
+            }else{
+            console.log('Invalid Driver Id')
+          }
+          map.fitBounds(bounds);
+        }
+        var current_info_window;
+        myFirebase.on('child_added', function(snapshot) {
+        var driver_id = snapshot.key()
+        if (parseInt(driver_id)) {
+            if (markers[driver_id] == null) {
+              var val = snapshot.val()
+              var position = new google.maps.LatLng(val["lat"],val["long"])
+              var marker = new google.maps.Marker({
+                  position: position,
+                  icon: icons['car'].icon,
+                  title: driver_id,
+                  map: map
+                  
+              });
+              marker.setMap(map)
+              marker.addListener('click', function() {
+                // var drivers = "<%= "Name: #{@drivers.first.name}  $(marker.title) Phone: #{@drivers.first.phone}  Availability: #{Driver.driver_avilabilities.keys[@drivers.first[:driver_availability]]}  State: #{Driver.driver_states.keys[@drivers.first[:driver_state]]}"%>"
+                var drivers = "<%= @drivers%>"
+                var driversCount = drivers.length
+                var driver = "Not find"
+                <% @drivers.each do |driver| %>
+                  if (<%=driver.id%> == marker.title){
+                    if (current_info_window != null){
+                      current_info_window.close()
+                    }
+                    var infowindow = new google.maps.InfoWindow({
+                      content: "<p>" +"<%=driver.name%>" + "<br />" + "<%=driver.availability_string%>" + "<br />" + "<%= driver.state_string%>" + "</p>"
+                    });
+                    infowindow.open(map, marker);
+                    current_info_window = infowindow
+                  }
+                <%end%>
+
+              });
+
+              markers[driver_id] = marker
+            }else{
+              var marker = markers[driver_id]
+              marker.addListener('click', function() {
+                  var drivers = "<%= @drivers%>"
+                  var driversCount = drivers.length
+                  var driver = "Not found"
+                  <% @drivers.each do |driver| %>
+                    if (<%=driver.id%> == marker.title){
+                    if (current_info_window != null){
+                      current_info_window.close()
+                    }
+                      var infowindow = new google.maps.InfoWindow({
+                        content: "<p>" +"<%=driver.name%>" + "<br />" + "<%=driver.availability_string%>" + "<br />" + "<%= driver.state_string%>" + "</p>"
+                      });
+                      infowindow.open(map, marker);
+                      current_info_window = infowindow
+                    }
+                  <%end%>
+
+                });
+            }
+          }else{
+        }
+      });
+
+      myFirebase.on('child_changed', function(snapshot) {
+        var driver_id = snapshot.key()
+        if (parseInt(driver_id)) {
+          var val = snapshot.val()
+          var position = new google.maps.LatLng(val["lat"],val["long"])
+          var marker = markers[driver_id]
+          if (tracked_marker != null && marker.title == tracked_marker.title){
+            map.panTo(marker.getPosition());
+          }
+          marker.setPosition(position)          
+          markers[driver_id] = marker
+          }else{
+        }
+      });
+      myFirebase.on('child_removed', function(snapshot) {
+        var driver_id = snapshot.key()
+        if (parseInt(driver_id)) {
+          var val = snapshot.val()
+          var position = new google.maps.LatLng(val["lat"],val["long"])
+          var marker = markers[driver_id]          
+          marker.setMap(null)
+          markers[driver_id] = null
+          }else{
+            console.log('Invalid Driver Id')
+        }
+      });
+      });
+      
+
+
+    }
+
+    // Begin listening for data
+    startListening();
+      }
+    </script>
+    <script async defer
+    src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDabHITcg1cwDz_ofOLxjQqe9kG9zFf2yM&callback=initMap">
+    </script>
+
+  </body>
+</html>
