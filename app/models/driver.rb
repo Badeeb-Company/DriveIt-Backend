@@ -27,7 +27,7 @@ class Driver < ApplicationRecord
     end
   end
   def get_driver_type
-    return Driver.driver_types.keys[self.driver_type].titleize
+    return Driver.driver_types.keys[self.driver_type].upcase
   end
   def as_json(options)
   	unless options[:auth] == true
