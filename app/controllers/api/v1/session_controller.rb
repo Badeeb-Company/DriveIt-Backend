@@ -24,8 +24,8 @@ module Api
 			error STATUS_ERROR, "Server Error Message"
  			meta :meta => {:status => STATUS_SUCCESS, :message => "Signup Completed"}, :driver => Driver.new().as_json(:auth => true)
 			def signup_driver
-				if param[:driver][:driver_type].blank?
-					param[:driver][:driver_type] = "CAR"
+				if params[:driver][:driver_type].blank?
+					params[:driver][:driver_type] = "CAR"
 				end
 				params[:driver][:driver_type] = Driver.driver_types[params[:driver][:driver_type].upcase]
 				@driver = Driver.new(driver_params)
