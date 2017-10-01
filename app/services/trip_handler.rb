@@ -27,16 +27,16 @@ class TripHandler
 	end
 	def client_data(driver)
 		if driver.blank?
-			return {:driver_phone => "", :driver_id => 0,:distance_to_arrive => 0, :driver_address => "", :driver_image_url => "", :driver_name => "", :id => @trip.id, :state => @trip.trip_state, :time_to_arrive => 0, :state => Trip.trip_states.keys[@trip.trip_state]}
+			return {:driver_phone => "", :driver_id => 0,:distance_to_arrive => 0, :driver_address => "", :driver_image_url => "", :driver_name => "", :id => @trip.id, :state => @trip.trip_state, :time_to_arrive => 0, :state => Trip.trip_states.keys[@trip.trip_state], :driver_type => ""}
 		end
 		set_driver_dict(driver)
 		p "Distance to arrive = #{@driver_dict[:distance][:distance]}"
-		return {:driver_phone => driver.phone, :driver_id => driver.id,:distance_to_arrive => @driver_dict[:distance][:distance], :driver_address => "", :driver_image_url => driver.image_url, :driver_name => driver.name, :id => @trip.id, :state => @trip.trip_state, :time_to_arrive => @driver_dict[:distance][:time], :state => Trip.trip_states.keys[@trip.trip_state]}
+		return {:driver_phone => driver.phone, :driver_id => driver.id,:distance_to_arrive => @driver_dict[:distance][:distance], :driver_address => "", :driver_image_url => driver.image_url, :driver_name => driver.name, :id => @trip.id, :state => @trip.trip_state, :time_to_arrive => @driver_dict[:distance][:time], :state => Trip.trip_states.keys[@trip.trip_state], :driver_type => driver.get_driver_type}
 	end
 	def driver_data(driver)
 		set_driver_dict(driver)
 		p "Distance to arrive = #{@driver_dict[:distance][:time]}"
-		return {:distance_to_arrive => @driver_dict[:distance][:distance],:client_address => @trip.destination, :client_id => @trip.user.id, :client_phone => @trip.user.phone, :client_image_url => @trip.user.image_url, :client_long => @trip.long, :client_lat => @trip.lat,:client_name => @trip.user.name, :client_phone => @trip.user.phone, :id => @trip.id, :state => Trip.trip_states.keys[@trip.trip_state],:time_to_arrive => @driver_dict[:distance][:time]}
+		return {:distance_to_arrive => @driver_dict[:distance][:distance],:client_address => @trip.destination, :client_id => @trip.user.id, :client_phone => @trip.user.phone, :client_image_url => @trip.user.image_url, :client_long => @trip.long, :client_lat => @trip.lat,:client_name => @trip.user.name, :client_phone => @trip.user.phone, :id => @trip.id, :state => Trip.trip_states.keys[@trip.trip_state],:time_to_arrive => @driver_dict[:distance][:time], :driver_type => driver.get_driver_type}
 	end
 	def set_driver_dict(driver)
 		

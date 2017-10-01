@@ -18,11 +18,13 @@ module Api
 				param :image_url, "URL", :required => true
 				param :password, String, :required => true
 				param :name, String, :required => true
+				param :driver_type, ["Car","Bike"], :required => true
 			end
 			error STATUS_BAD_REQUEST, "Error Message"
 			error STATUS_ERROR, "Server Error Message"
  			meta :meta => {:status => STATUS_SUCCESS, :message => "Signup Completed"}, :driver => Driver.new().as_json(:auth => true)
 			def signup_driver
+				params[:driver][:driver_type] = Driver.driver_types[params[:driver][:driver_type].upcase]
 				@driver = Driver.new(driver_params)
 				return render :status => STATUS_ERROR, :json => {:meta => {:status => STATUS_ERROR, :message => @driver.errors.full_messages.first}, :errors => @driver.errors.full_messages.first} unless @driver.save
 				return render :status => STATUS_SUCCESS, :json => {:meta => {:status => STATUS_SUCCESS, :message => "Signup Completed"},:driver => @driver.as_json(:auth => true)}
@@ -122,7 +124,7 @@ module Api
 				end
 
 				def driver_params
-					params[:driver].permit(:email, :phone,:image_url,:password,:name)
+					params[:driver].permit(:email, :phone,:image_url,:password,:name,:driver_type)
 				end
 		end
 	end

@@ -14,7 +14,7 @@ class Driver < ApplicationRecord
   after_create :firebase_migrate
   def firebase_migrate
     firebase = Firebase::Client.new(Rails.application.secrets.FIR_Base_URL)
-    response = firebase.set("drivers/#{self.id}/", {:trip => {:distance_to_arrive => 0,:time_to_arrive => 0, :client_address => "", :client_id => 0, :client_phone => "", :client_image_url => "", :client_long => 0, :client_lat => 0,:client_name => "", :client_phone => "", :id => 0, :state => ""}
+    response = firebase.set("drivers/#{self.id}/", {:trip => {:distance_to_arrive => 0,:time_to_arrive => 0, :client_address => "", :client_id => 0, :client_phone => "", :client_image_url => "", :client_long => 0, :client_lat => 0,:client_name => "", :client_phone => "", :id => 0, :state => "", :driver_type => self.get_driver_type}
 })
     unless response.success?
       self.errors.add(:firebase, "Cannot save record")
@@ -26,6 +26,9 @@ class Driver < ApplicationRecord
       return false
     end
   end
+  def get_driver_type
+    return Driver.driver_types.keys[self.driver_type].titleize
+  end
   def as_json(options)
   	unless options[:auth] == true
 	  	options[:except] ||= [:token]
@@ -34,6 +37,7 @@ class Driver < ApplicationRecord
      if options[:html] == true
         return json.to_json.html_safe
       end
+      json[:driver_type]= self.get_driver_type
      return json
   end  
   def map_description
