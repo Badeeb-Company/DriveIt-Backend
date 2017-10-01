@@ -106,7 +106,7 @@ module Api
 				return render :status => STATUS_SUCCESS, :json => {:meta => {:status => STATUS_SUCCESS, :message => "Driver Logged Out"}}
 			end
 
-			api :PATCH, "/api/v1/driver", "Update driver"
+			api :PUT, "/api/v1/driver", "Update driver"
 			param :avilability, Driver.driver_avilabilities.keys, :required => true
 			header :Authorization, 'Token token=Access Token', :required => true
 			error STATUS_ERROR, "Driver not found"
