@@ -19,10 +19,11 @@ default: &default
   pool: <%= ENV.fetch("RAILS_MAX_THREADS") { 5 } %>
   username: root
   password: root
+  host: localhost
   # username: mostafa
   # password: root
 #  socket: /tmp/mysql.sock
-host: localhost
+
 development:
   <<: *default
   database: DriveIt_development
