@@ -38,7 +38,7 @@ module Api
 			def authenticat_driver!
 				p "authenticat_driver"
 				authenticate_or_request_with_http_token do |token, options|
-					p Driver.exists?(token: token)
+					p User.exists?(token: token)
 					User.exists?(token: token)
 				end
 			end

@@ -2,8 +2,8 @@ module Api
 	module V1
 		class TripController < BaseController
 			require 'trip_handler.rb'
-			#skip_before_action :authenticate_user!, :except => [:request_trip, :cancel_trip]
-			#skip_before_action :authenticate_driver!, :except => [:reject_trip, :accept_trip]
+
+			STATUS_UNAUTHORIZED = "401"
 
 			api :POST, "/api/v1/trip", "Request Trip (Client side)"
 			param :destination, String, :required => true
@@ -15,7 +15,7 @@ module Api
 			meta :meta => {:status => STATUS_SUCCESS, :message => "Trip Requested"}, :trip => "Integer"
 			def request_trip
 				if current_user.blank?
-					return render :status => STATUS_ERROR, :json => {:meta => {:status => STATUS_ERROR, :message => "Not logged in"}}
+					return render :status => :unauthorized, :json => {:meta => {:status => STATUS_UNAUTHORIZED, :message => "Not logged in"}}
 				end
 				# old_trip = Trip.where(:user_id => current_user.id, :trip_state => [Trip.trip_states[:pending], Trip.trip_states[:rejected]]).first
 				# p "old_trip = #{old_trip}"	
@@ -38,7 +38,7 @@ module Api
 			meta :meta => {:status => STATUS_SUCCESS, :message => "Trip Rejected"}			
 			def reject_trip
 				if current_driver.blank?
-					return render :status => STATUS_ERROR, :json => {:meta => {:status => STATUS_ERROR, :message => "Not logged in"}}
+					return render :status => :unauthorized, :json => {:meta => {:status => STATUS_UNAUTHORIZED, :message => "Not logged in"}}
 				end
 				@trip = Trip.where(:id => params[:trip_id].to_i).first
 				return render :status => STATUS_NotFound, :json => {:meta => {:status => STATUS_NotFound, :message => "Trip not found"}} if @trip.blank?
@@ -61,7 +61,7 @@ module Api
 			meta :meta => {:status => STATUS_SUCCESS, :message => "Trip Accepted"}, :trip => "Integer"
 			def accept_trip
 				if current_driver.blank?
-					return render :status => STATUS_ERROR, :json => {:meta => {:status => STATUS_ERROR, :message => "Not logged in"}}
+					return render :status => :unauthorized, :json => {:meta => {:status => STATUS_UNAUTHORIZED, :message => "Not logged in"}}
 				end
 				@trip = Trip.where(:id => params[:trip_id].to_i).first
 				return render :status => STATUS_NotFound, :json => {:meta => {:status => STATUS_NotFound, :message => "Trip not found"}} if @trip.blank?
@@ -84,7 +84,7 @@ module Api
 			meta :meta => {:status => STATUS_SUCCESS, :message => "Trip Canceled"}, :trip => "Integer"
 			def cancel_trip
 				if current_user.blank?
-					return render :status => STATUS_ERROR, :json => {:meta => {:status => STATUS_ERROR, :message => "Not logged in"}}
+					return render :status => :unauthorized, :json => {:meta => {:status => STATUS_UNAUTHORIZED, :message => "Not logged in"}}
 				end
 				@trip = Trip.where(:id => params[:trip_id].to_i).first
 				return render :status => STATUS_NotFound, :json => {:meta => {:status => STATUS_NotFound, :message => "Trip not found"}} if @trip.blank?
@@ -101,7 +101,7 @@ module Api
 			meta :meta => {:status => STATUS_SUCCESS, :message => "Trip Completed"}, :trip => "Integer"			
 			def complete_trip
 				if current_driver.blank?
-					return render :status => STATUS_ERROR, :json => {:meta => {:status => STATUS_ERROR, :message => "Not logged in"}}
+					return render :status => :unauthorized, :json => {:meta => {:status => STATUS_UNAUTHORIZED, :message => "Not logged in"}}
 				end
 				@trip = Trip.where(:id => params[:trip_id].to_i).first
 				return render :status => STATUS_NotFound, :json => {:meta => {:status => STATUS_NotFound, :message => "Trip not found"}} if @trip.blank?
