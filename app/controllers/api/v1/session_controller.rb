@@ -1,8 +1,9 @@
 module Api
 	module V1
 		class SessionController < BaseController
-			# skip_before_action :authenticate_user!#, :except => [:logout]
-		#	skip_before_action :authenticate_driver!
+			
+		STATUS_UNAUTHORIZED = "401"
+
 			def_param_group :device  do 
 				param :device, Hash, :required => true do
 					param :device_id, String, :required => true
@@ -114,7 +115,7 @@ module Api
 			def update_driver
 				@driver = current_driver
 				if @driver.blank?
-					return render :status => STATUS_ERROR, :json => {:meta => {:status => STATUS_ERROR, :message => "Driver not found"}}					
+					return render :status => :unauthorized, :json => {:meta => {:status => STATUS_UNAUTHORIZED, :message => "Driver not found"}}					
 				end
 				@driver.update_attributes(:driver_availability => Driver.driver_avilabilities["#{params[:avilability]}"])
 				return render :status => STATUS_SUCCESS, :json => {:meta => {:status => STATUS_SUCCESS, :message => "Driver Updated"}}
