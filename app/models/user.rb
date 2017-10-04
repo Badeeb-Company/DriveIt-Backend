@@ -26,11 +26,15 @@ class User < ApplicationRecord
 	  end
 	   json = super(options)
      return json
-  end  
+  end
+
+  def self.new_token
+    Devise.friendly_token(length = 100)
+  end
 
   private 
   def generate_access_token
-  	self.token = Devise.friendly_token(length = 100)
+  	self.token = User.new_token
   	self.user_state = User.user_states[:available]
   end
 

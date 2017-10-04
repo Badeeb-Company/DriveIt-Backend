@@ -56,7 +56,13 @@
 
           <% if admin_signed_in? %>        
           <ul class="nav navbar-nav">
-            <li><%= link_to "Map", :map  %></li>
+            <li><%= link_to "Tracking", :map  %></li>
+          </ul>
+          <ul class="nav navbar-nav">
+            <li><%= link_to "Drivers", :drivers  %></li>
+          </ul>
+          <ul class="nav navbar-nav">
+            <li><%= link_to "Clients", :users  %></li>
           </ul>
           <% end %>
 

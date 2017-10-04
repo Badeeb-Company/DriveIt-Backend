@@ -39,18 +39,14 @@
     <tbody>
     <% for driver in @drivers_table %>
        <tr>
-        <th> <%= driver.id %> </th>
-        <th><%= driver.name %></th>
-        <th> <%= driver.phone %> </th>
-        <th> <%= driver.get_driver_type %> </th>
-        <th><%= driver.availability_string%></th>
-        <th><%= driver.state_string %></th>
+        <td> <%= driver.id %> </td>
+        <td><%= driver.name %></td>
+        <td> <%= driver.phone %> </td>
+        <td> <%= driver.get_driver_type %> </td>
+        <td><%= driver.availability_string%></td>
+        <td><%= driver.state_string %></td>
         <td ><button class="btn btn-info" id= <%=driver.id%>>Track</button></td>
-        <% if driver.state_string == "Available" %>
-          <td> <button class="btn btn-success" id= "AllDrivers" disabled="true">Available</button>
-        <%else%>
-          <td> <button class="btn btn-success" id= "AllDrivers" onclick="location.href='/map/driver_available?id=<%=driver.id%>';">Available</button>
-        <%end%>
+
       </tr>
     <% end %>
     </tbody>

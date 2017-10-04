@@ -57,9 +57,14 @@ class Driver < ApplicationRecord
       return "Available"
     end
   end
-  private 
+
+  def self.new_token
+    Devise.friendly_token(length = 100)
+  end
+
+  private
   def generate_access_token
-  	self.token = Devise.friendly_token(length = 100)
+  	self.token = Driver.new_token
   	self.driver_state = Driver.driver_states[:AVAILABLE]
     self.driver_availability = Driver.driver_avilabilities[:OFFLINE]
   end
