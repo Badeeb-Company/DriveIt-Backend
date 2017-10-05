@@ -100,7 +100,7 @@ module Api
 			def logout
 				@driver = current_driver
 				if @driver.blank?
-					return render :status => STATUS_ERROR, :json => {:meta => {:status => STATUS_ERROR, :message => "Driver not found"}}
+					return render :status => :unauthorized, :json => {:meta => {:status => STATUS_UNAUTHORIZED, :message => "Driver not found"}}
 				end
 				
 				@driver.update_attributes(:driver_availability => Driver.driver_avilabilities[:OFFLINE])
