@@ -36,6 +36,7 @@ Rails.application.routes.draw do
       post "trip/:trip_id/cancel", :to => "trip#cancel_trip"
       post "trip/:trip_id/complete", :to => "trip#complete_trip"
       put "driver", :to => "session#update_driver"
+      put "client", :to => "session#update_client_location"
       patch "driver", :to => "session#update_driver"
   	end
   end

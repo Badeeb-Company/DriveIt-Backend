@@ -121,6 +121,22 @@ module Api
 				return render :status => STATUS_SUCCESS, :json => {:meta => {:status => STATUS_SUCCESS, :message => "Driver Updated"}}
 			end
 
+			api :PUT, "/api/v1/client", "Update client location"
+			param :lat, String
+			param :long, String
+			param :address, String
+			header :Authorization, 'Token token=Access Token', :required => true
+			error STATUS_ERROR, "Driver not found"
+			meta :meta => {:status => STATUS_SUCCESS, :message => "Client location updated"}
+			def update_client_location
+				@user = current_user
+				if @user.blank?
+					return render :status => :unauthorized, :json => {:meta => {:status => STATUS_UNAUTHORIZED, :message => "Client not found"}}					
+				end
+				@user.update_attributes(lat: params[:lat], long: params[:long], address: params[:address])
+				return render :status => STATUS_SUCCESS, :json => {:meta => {:status => STATUS_SUCCESS, :message => "Clinet location updated"}}
+			end
+
 
 			private 
 				def user_params
