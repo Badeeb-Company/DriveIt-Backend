@@ -24,6 +24,7 @@
   <thead>
     <tr>
       <th>Index</th>
+      <th>Record ID</th>
       <th>Driver ID</th>
       <th>Driver</th>
       <th>Distance</th>
@@ -34,6 +35,7 @@
     <% @trip.trip_drivers.each_with_index do |trip_driver, i| %>
       <tr>
         <td><%= i %></td>
+        <td><%= trip_driver.id %></td>
         <td><%= trip_driver.driver.id %></td>
         <td><%= trip_driver.driver.name %></td>
         <td><%= trip_driver.distance %></td>
