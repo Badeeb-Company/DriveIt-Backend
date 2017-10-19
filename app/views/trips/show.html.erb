@@ -12,8 +12,6 @@
   <dd><%= @trip.trip_state_string %></dd>
   <dt><strong><%= model_class.human_attribute_name(:destination) %>:</strong></dt>
   <dd><%= @trip.destination %></dd>
-  <dt><strong><%= model_class.human_attribute_name(:index) %>:</strong></dt>
-  <dd><%= @trip.index %></dd>
 </dl>
 
 <div class="page-header">
@@ -23,20 +21,18 @@
 <table class="table table-striped">
   <thead>
     <tr>
-      <th>Index</th>
-      <th>Record ID</th>
+      <th>Order</th>
       <th>Driver ID</th>
-      <th>Driver</th>
+      <th>Driver Name</th>
       <th>Distance</th>
       <th>Time</th>
       <th>Created at</th>
     </tr>
   </thead>
   <tbody>
-    <% @trip.trip_drivers.each_with_index do |trip_driver, i| %>
-      <tr>
+    <% @trip.trip_drivers.order(id: :asc).each_with_index do |trip_driver, i| %>
+      <tr class="<%=trip_driver.class_name(i)%>">
         <td><%= i %></td>
-        <td><%= trip_driver.id %></td>
         <td><%= trip_driver.driver.id %></td>
         <td><%= trip_driver.driver.name %></td>
         <td><%= trip_driver.distance %></td>

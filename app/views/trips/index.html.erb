@@ -10,7 +10,6 @@
       <th><%= model_class.human_attribute_name(:driver_id) %></th>
       <th><%= model_class.human_attribute_name(:trip_state) %></th>
       <th><%= model_class.human_attribute_name(:destination) %></th>
-      <th><%= model_class.human_attribute_name(:index) %></th>
       <th><%= model_class.human_attribute_name(:created_at) %></th>
       <th><%=t '.actions', :default => t("helpers.actions") %></th>
     </tr>
@@ -23,7 +22,6 @@
         <td><%= trip.driver_name %></td>
         <td><%= trip.trip_state_string %></td>
         <td><%= trip.destination %></td>
-        <td><%= trip.index %></td>
         <td><%= trip.created_at %></td>
         <td>
           <%= link_to t('.show', :default => t("helpers.links.show")),

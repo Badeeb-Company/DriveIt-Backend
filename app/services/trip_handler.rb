@@ -30,12 +30,10 @@ class TripHandler
 			return {:driver_phone => "", :driver_id => 0,:distance_to_arrive => 0, :driver_address => "", :driver_image_url => "", :driver_name => "", :id => @trip.id, :state => @trip.trip_state, :time_to_arrive => 0, :state => Trip.trip_states.keys[@trip.trip_state], :driver_type => ""}
 		end
 		set_driver_dict(driver)
-		p "Distance to arrive = #{@driver_dict[:distance][:distance]}"
 		return {:driver_phone => driver.phone, :driver_id => driver.id,:distance_to_arrive => @driver_dict[:distance][:distance], :driver_address => "", :driver_image_url => driver.image_url, :driver_name => driver.name, :id => @trip.id, :state => @trip.trip_state, :time_to_arrive => @driver_dict[:distance][:time], :state => Trip.trip_states.keys[@trip.trip_state], :driver_type => driver.get_driver_type}
 	end
 	def driver_data(driver)
 		set_driver_dict(driver)
-		p "Distance to arrive = #{@driver_dict[:distance][:time]}"
 		return {:distance_to_arrive => @driver_dict[:distance][:distance],:client_address => @trip.destination, :client_id => @trip.user.id, :client_phone => @trip.user.phone, :client_image_url => @trip.user.image_url, :client_long => @trip.long, :client_lat => @trip.lat,:client_name => @trip.user.name, :client_phone => @trip.user.phone, :id => @trip.id, :state => Trip.trip_states.keys[@trip.trip_state],:time_to_arrive => @driver_dict[:distance][:time], :driver_type => driver.get_driver_type}
 	end
 	def set_driver_dict(driver)
@@ -88,7 +86,8 @@ class TripHandler
 			driver_id = @fir_drivers[@index][:id].to_i
 			Rails.logger.info("Driver ID = #{driver_id}")
 			driver = Driver.where(id: driver_id, :driver_state => Driver.driver_states[:AVAILABLE], :driver_availability => Driver.driver_avilabilities[:ONLINE]).first
-			Rails.logger.info("Will check Driver #{driver.id}")
+			Rails.logger.info("Will check Driver #{driver_id}")
+			# maybe
 			if driver.present?
 				Rails.logger.info("Will invite Driver #{driver.id}")
 				invite_driver(driver)
@@ -97,7 +96,7 @@ class TripHandler
 				@trip.save
 				return
 			end
-			Rails.logger.info("Driver with id =#{driver.id} can't be invited")
+			Rails.logger.info("Driver with id =#{driver_id} can't be invited")
 			@index = @index + 1
 			@trip.index = @index 
 			@trip.save
@@ -124,9 +123,7 @@ class TripHandler
 	def filter_drivers(drivers)
 		filtered_drivers = []
 		p "Filter drivers #{drivers}"
-		# p "Driver keys = #{drivers.keys}"
 		drivers.keys.each do |driver_id|
-			# p "Checking driver with id = #{driver_id}, location = #{drivers["#{driver_id}"]}"
 			driver_location = drivers["#{driver_id}"].to_a
 			driver = Driver.where(:id => driver_id, :driver_availability => Driver.driver_avilabilities[:ONLINE], :driver_state => [Driver.driver_states[:AVAILABLE], Driver.driver_states[:INVITED]]).first
 			if driver.present?
@@ -229,9 +226,6 @@ class TripHandler
     	if @trip.driver_id.present?
     		driver = Driver.where(:id => @trip.driver_id).first
     		driver.update_attributes(:driver_state => Driver.driver_states[:AVAILABLE])
-    		if driver.present?
-		    	# response = firebase.set("drivers/#{driver.id}/trip/", self.driver_data(driver))
-		    end
 		end
 		response = firebase.set("clients/#{@trip.user.id}/trip/",self.client_data(driver))
     	unless response.success?
