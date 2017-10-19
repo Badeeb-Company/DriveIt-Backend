@@ -18,7 +18,7 @@ class Trip < ApplicationRecord
 =end
 
 	def trip_state_string
-		if driver
+		# if driver
 			case self.trip_state
 			when 1
 				'Pending'
@@ -33,16 +33,16 @@ class Trip < ApplicationRecord
 			when 6
 				'Rejected'
 			end
-		else
-			case self.trip_state
-			when 1
-				'Pending'
-			when 2
-				'Accepted'
-			when 3
-				'Not served'
-			end
-		end
+		# else
+		# 	case self.trip_state
+		# 	when 1
+		# 		'Pending'
+		# 	when 2
+		# 		'Accepted'
+		# 	when 3
+		# 		'Not served'
+		# 	end
+		# end
 	end
 
 	def driver_name
