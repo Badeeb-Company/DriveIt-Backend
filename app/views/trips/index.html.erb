@@ -19,9 +19,9 @@
     <% @trips.each do |trip| %>
       <tr>
         <td><%= link_to trip.id, trip_path(trip) %></td>
-        <td><%= trip.user_id %></td>
-        <td><%= trip.driver_id %></td>
-        <td><%= trip.trip_state %></td>
+        <td><%= trip.user.name %></td>
+        <td><%= trip.driver_name %></td>
+        <td><%= trip.trip_state_string %></td>
         <td><%= trip.destination %></td>
         <td><%= trip.index %></td>
         <td><%=l trip.created_at %></td>
@@ -37,3 +37,5 @@
 <%= link_to t('.new', :default => t("helpers.links.new")),
             new_trip_path,
             :class => 'btn btn-primary' %>
+
+<%= will_paginate @trips, renderer: BootstrapPagination::Rails %>
