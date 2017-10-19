@@ -3,46 +3,26 @@ class Trip < ApplicationRecord
 	belongs_to :user
 	has_many :trip_drivers
 	#belongs_to :driver
-=begin
-	- Client —> 
-	  1) PENDING
-	  2) ACCEPTED
-   	  3) NOT_SERVED
-	- Driver —> 
-	1) PENDING
-  	2) EXPIRED
-	3) IN_PROGRESS
-	4) COMPLETED
-	5) CANCELLED
-	6) REJECTED
-=end
 
 	def trip_state_string
-		# if driver
-			case self.trip_state
-			when 1
-				'Pending'
-			when 2
-				'Expired'
-			when 3
-				'In Progress'
-			when 4
-				'Completed'
-			when 5
-				'Cancelled'
-			when 6
-				'Rejected'
-			end
-		# else
-		# 	case self.trip_state
-		# 	when 1
-		# 		'Pending'
-		# 	when 2
-		# 		'Accepted'
-		# 	when 3
-		# 		'Not served'
-		# 	end
-		# end
+		case self.trip_state
+		when 0
+			'Pending'
+		when 1
+			'Accepted'
+		when 2
+			'Not served'
+		when 3
+			'Expired'
+		when 4
+			'In progress'
+		when 5
+			'Completed'
+		when 6
+			'Cancelled'
+		when 7
+			'Rejected'
+		end
 	end
 
 	def driver_name
