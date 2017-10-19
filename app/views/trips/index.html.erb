@@ -1,0 +1,39 @@
+<%- model_class = Trip -%>
+<div class="page-header">
+  <h1><%=t '.title', :default => model_class.model_name.human.pluralize.titleize %></h1>
+</div>
+<table class="table table-striped">
+  <thead>
+    <tr>
+      <th><%= model_class.human_attribute_name(:id) %></th>
+      <th><%= model_class.human_attribute_name(:user_id) %></th>
+      <th><%= model_class.human_attribute_name(:driver_id) %></th>
+      <th><%= model_class.human_attribute_name(:trip_state) %></th>
+      <th><%= model_class.human_attribute_name(:destination) %></th>
+      <th><%= model_class.human_attribute_name(:index) %></th>
+      <th><%= model_class.human_attribute_name(:created_at) %></th>
+      <th><%=t '.actions', :default => t("helpers.actions") %></th>
+    </tr>
+  </thead>
+  <tbody>
+    <% @trips.each do |trip| %>
+      <tr>
+        <td><%= link_to trip.id, trip_path(trip) %></td>
+        <td><%= trip.user_id %></td>
+        <td><%= trip.driver_id %></td>
+        <td><%= trip.trip_state %></td>
+        <td><%= trip.destination %></td>
+        <td><%= trip.index %></td>
+        <td><%=l trip.created_at %></td>
+        <td>
+          <%= link_to t('.show', :default => t("helpers.links.show")),
+                      trip_path(trip), :class => 'btn btn-default btn-xs' %>
+        </td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>
+
+<%= link_to t('.new', :default => t("helpers.links.new")),
+            new_trip_path,
+            :class => 'btn btn-primary' %>

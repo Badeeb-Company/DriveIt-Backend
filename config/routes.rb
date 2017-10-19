@@ -20,6 +20,8 @@ Rails.application.routes.draw do
       patch 'deactivate'
     end
   end
+
+  resources :trips
   # root :to => "apipie/apipies#index"
   root :to => "map#map"
   get "map", :to => "map#map"
