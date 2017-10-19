@@ -24,7 +24,7 @@
         <td><%= trip.trip_state_string %></td>
         <td><%= trip.destination %></td>
         <td><%= trip.index %></td>
-        <td><%=l trip.created_at %></td>
+        <td><%= trip.created_at %></td>
         <td>
           <%= link_to t('.show', :default => t("helpers.links.show")),
                       trip_path(trip), :class => 'btn btn-default btn-xs' %>
