@@ -1,7 +1,7 @@
 class Trip < ApplicationRecord
 	enum trip_states: [:PENDING, :ACCEPTED, :NOT_SERVED, :EXPIRED, :IN_PROGRESS, :COMPLETED, :CANCELLED, :REJECTED]
 	belongs_to :user
-	has_many :trip_drivers
+	has_many :trip_drivers, dependent: :destroy
 	#belongs_to :driver
 
 	def trip_state_string
