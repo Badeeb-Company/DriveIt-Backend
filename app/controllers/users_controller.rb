@@ -1,5 +1,6 @@
 class UsersController < ApplicationController
-  before_action :set_user, only: [:show, :edit, :update, :destroy, :activate, :deactivate]
+  before_action :set_user, only: [:show, :edit, :update, :destroy, :activate, :deactivate, 
+    :edit_password, :update_password]
 
   # GET /users
   # GET /users.json
@@ -21,6 +22,10 @@ class UsersController < ApplicationController
   def edit
   end
 
+  # GET /users/1/edit_password
+  def edit_password
+  end
+
   # POST /users
   # POST /users.json
   def create
@@ -33,6 +38,7 @@ class UsersController < ApplicationController
     end
   end
 
+
   # PATCH/PUT /users/1
   # PATCH/PUT /users/1.json
   def update
@@ -40,6 +46,14 @@ class UsersController < ApplicationController
       redirect_to @user, notice: 'User was successfully updated.'
     else
       render :edit
+    end
+  end
+
+  def update_password
+    if @user.update(change_password_user_params)
+      redirect_to @user, notice: 'Password changed successfully'
+    else
+      render :edit_password
     end
   end
 
@@ -73,5 +87,9 @@ class UsersController < ApplicationController
     # Never trust parameters from the scary internet, only allow the white list through.
     def user_params
       params.fetch(:user, {}).permit(:email, :name, :phone)
+    end
+
+    def change_password_user_params
+      params.fetch(:user, {}).permit(:password, :password_confirmation)
     end
 end

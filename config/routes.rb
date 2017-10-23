@@ -18,6 +18,8 @@ Rails.application.routes.draw do
     member do
       patch 'activate'
       patch 'deactivate'
+      get 'edit_password'
+      patch 'update_password'
     end
   end
 
