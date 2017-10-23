@@ -12,6 +12,8 @@ Rails.application.routes.draw do
       patch 'activate'
       patch 'deactivate'
       patch 'available'
+      get 'edit_password'
+      patch 'update_password'
     end
   end
   resources :users do

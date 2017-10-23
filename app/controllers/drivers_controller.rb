@@ -1,5 +1,6 @@
 class DriversController < ApplicationController
-  before_action :set_driver, only: [:show, :edit, :update, :destroy, :activate, :deactivate, :available]
+  before_action :set_driver, only: [:show, :edit, :update, :destroy, :activate, :deactivate, :available, 
+    :edit_password, :update_password]
 
   # GET /drivers
   # GET /drivers.json
@@ -21,6 +22,10 @@ class DriversController < ApplicationController
   def edit
   end
 
+  # GET /users/1/edit_password
+  def edit_password
+  end
+
   # POST /drivers
   # POST /drivers.json
   def create
@@ -40,6 +45,14 @@ class DriversController < ApplicationController
       redirect_to @driver, notice: 'Driver was successfully updated.'
     else
       render :edit
+    end
+  end
+
+  def update_password
+    if @driver.update(change_password_driver_params)
+      redirect_to @driver, notice: 'Password changed successfully'
+    else
+      render :edit_password
     end
   end
 
@@ -82,5 +95,9 @@ class DriversController < ApplicationController
     # Never trust parameters from the scary internet, only allow the white list through.
     def driver_params
       params.fetch(:driver, {}).permit(:email, :name, :phone)
+    end
+
+    def change_password_driver_params
+      params.fetch(:driver, {}).permit(:password, :password_confirmation)
     end
 end
