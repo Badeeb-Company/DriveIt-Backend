@@ -1,7 +1,11 @@
-# This file should contain all the record creation needed to seed the database with its default values.
-# The data can then be loaded with the rails db:seed command (or created alongside the database with db:setup).
-#
-# Examples:
-#
-#   movies = Movie.create([{ name: 'Star Wars' }, { name: 'Lord of the Rings' }])
-#   Character.create(name: 'Luke', movie: movies.first)
+Setting.create(
+	key: Setting::SEARCH_MAX_DISTANCE,
+	value: '5',
+	description: 'Maximum distance (in km) to search when finding drivers'
+	)
+
+Setting.create(
+	key: Setting::DRIVER_TIMEOUT,
+	value: '20',
+	description: 'The time (in seconds) a request is available for a driver before expiry'
+	)

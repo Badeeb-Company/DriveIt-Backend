@@ -32,8 +32,5 @@
   </tbody>
 </table>
 
-<%= link_to t('.new', :default => t("helpers.links.new")),
-            new_trip_path,
-            :class => 'btn btn-primary' %>
 
 <%= will_paginate @trips, renderer: BootstrapPagination::Rails %>

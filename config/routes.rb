@@ -1,4 +1,5 @@
 Rails.application.routes.draw do
+  resources :settings
   devise_for :admins
   devise_for :drivers
   devise_for :users

@@ -91,7 +91,9 @@ class TripHandler
 			if driver.present?
 				Rails.logger.info("Will invite Driver #{driver.id}")
 				invite_driver(driver)
-				delay(run_at: Rails.application.secrets.driver_timeout.seconds.from_now).invalidate_driver(driver)
+				settings_driver_timeout = Setting.get_value(Setting::DRIVER_TIMEOUT, 
+					Rails.application.secrets.driver_timeout).to_i
+				delay(run_at: settings_driver_timeout.seconds.from_now).invalidate_driver(driver)
 				@trip.index = @index 
 				@trip.save
 				return
@@ -132,7 +134,9 @@ class TripHandler
 				# p driver_source
 				# p @trip_location
 				driver_to_passenger_cost = Geocoder::Calculations::distance_between(driver_source, @trip_location, units: :km)
-				if driver_to_passenger_cost <= (Rails.application.secrets.max_distance)
+				settings_max_distance = Setting.get_value(Setting::SEARCH_MAX_DISTANCE, 
+					Rails.application.secrets.max_distance).to_i
+				if driver_to_passenger_cost <= (settings_max_distance)
 					dict = Hash.new()
 					dict[:id] = driver_id
 					dict[:distance] = Hash.new()
