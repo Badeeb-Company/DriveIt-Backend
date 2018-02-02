@@ -14,9 +14,6 @@ gem 'net-ssh'
 gem 'jquery-rails'
 gem 'jbuilder', '~> 2.5'
 
-# paperclip
-gem 'paperclip', '4.3.5'
-
 gem 'firebase'
 # Running jobs in the background
 gem 'delayed_job'
