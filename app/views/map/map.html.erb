@@ -52,17 +52,13 @@
     </tbody>
     </table>
     <%= will_paginate @drivers_table, renderer: BootstrapPagination::Rails%>
-    <script>
-    // ...
 
-
-  </script>
     <script>
-      // 'https://driveit-e768a.firebaseio.com/development/locations/drivers/'
       var myFirebase = new Firebase("<%= "#{Rails.application.secrets.FIR_Base_URL}locations/drivers"%>");
       var map;
       var markers = {}
       var tracked_marker;
+
       $('.btn').click(function(ev){
         var driver_id = ev.target.id
         if (driver_id != 'AllDrivers') {
@@ -78,19 +74,17 @@
             $("html, body").animate({ scrollTop: 0 }, "slow");
           }
         }
-    });
-      function trackDrivers(){
-        console.log('trackDrivers')
-      };
+      });
+
       document.getElementById('AllDrivers').addEventListener("click", function(){
         console.log('All Drivers')
-          tracked_marker = null;
-          var bounds = new google.maps.LatLngBounds();
-          for (var marker_id in markers) {
-              var marker = markers[marker_id]
-              bounds.extend(marker.getPosition());
-          }
-          map.fitBounds(bounds);
+        tracked_marker = null;
+        var bounds = new google.maps.LatLngBounds();
+        for (var marker_id in markers) {
+          var marker = markers[marker_id]
+          bounds.extend(marker.getPosition());
+        }
+        map.fitBounds(bounds);
       });
 
 
@@ -103,145 +97,124 @@
 
         var iconBase = 'https://maps.google.com/mapfiles/kml/shapes/';
         var icons = {
-          parking: {
-            name: 'Parking',
-            icon: iconBase + 'parking_lot_maps.png'
-          },
-          library: {
-            name: 'Library',
-            icon: iconBase + 'library_maps.png'
-          },
           car: {
             name: 'Car',
-            // icon: iconBase + 'info-i_maps.png'
             icon: '/assets/car.png'
           }
         };
-        /** Function to add a data listener **/
 
-    var startListening = function() {
-      myFirebase.once('value', function(snapshot) {
-        var drivers = snapshot.val()
-        var bounds = new google.maps.LatLngBounds();
-        for (var driver_id in drivers) {
-          if (parseInt(driver_id)) {
-              if (markers[driver_id] == null) {
-                var val = drivers[driver_id]
-                var position = new google.maps.LatLng(val["lat"],val["long"])
-                var marker = new google.maps.Marker({
+        /** Function to add a data listener **/
+        var startListening = function() {
+
+          myFirebase.once('value', function(snapshot) {
+            var drivers = snapshot.val()
+            var bounds = new google.maps.LatLngBounds();
+            for (var driver_id in drivers) {
+              if (parseInt(driver_id)) {
+                if (markers[driver_id] == null) {
+                  var val = drivers[driver_id]
+                  var position = new google.maps.LatLng(val["lat"],val["long"])
+                  var marker = new google.maps.Marker({
                     position: position,
                     icon: icons['car'].icon,
                     title: driver_id,
                     map: map
-                    
-                });
-                marker.setMap(map)
-                bounds.extend(marker.getPosition());
+                  });
+                  marker.setMap(map)
+                  bounds.extend(marker.getPosition());
+                  markers[driver_id] = marker
+                }
+              }
+              map.fitBounds(bounds);
+            }
+
+            var current_info_window;
+
+            myFirebase.on('child_added', function(snapshot) {
+              var driver_id = snapshot.key()
+              if (parseInt(driver_id)) {
+                if (markers[driver_id] == null) {
+                  var val = snapshot.val()
+                  var position = new google.maps.LatLng(val["lat"],val["long"])
+                  var marker = new google.maps.Marker({
+                    position: position,
+                    icon: icons['car'].icon,
+                    title: driver_id,
+                    map: map
+
+                  });
+                  marker.setMap(map)
+                  marker.addListener('click', function() {
+                    <% @drivers.each do |driver| %>
+                      if (<%=driver.id%> == marker.title){
+                        if (current_info_window != null){
+                          current_info_window.close()
+                        }
+                        var infowindow = new google.maps.InfoWindow({
+                          content: "<p>" +"<%=driver.name%>" + "<br />" + "<%=driver.get_driver_type%>" + "<br />" + "<%=driver.availability_string%>" + "<br />" + "<%= driver.state_string%>" + "</p>"
+                        });
+                        infowindow.open(map, marker);
+                        current_info_window = infowindow
+                      }
+                    <%end%>
+
+                  });
+
+                  markers[driver_id] = marker
+
+                } else {
+                  var marker = markers[driver_id]
+                  marker.addListener('click', function() {
+                    <% @drivers.each do |driver| %>
+                      if (<%=driver.id%> == marker.title){
+                        if (current_info_window != null){
+                          current_info_window.close()
+                        }
+                        var infowindow = new google.maps.InfoWindow({
+                          content: "<p>" +"<%=driver.name%>" + "<br />" + "<%=driver.get_driver_type%>" + "<br />" + "<%=driver.availability_string%>" + "<br />" + "<%= driver.state_string%>" + "</p>"
+                        });
+                        infowindow.open(map, marker);
+                        current_info_window = infowindow
+                      }
+                    <%end%>
+
+                  });
+                }
+
+              }
+            });
+
+            myFirebase.on('child_changed', function(snapshot) {
+              var driver_id = snapshot.key()
+              if (parseInt(driver_id)) {
+                var val = snapshot.val()
+                var position = new google.maps.LatLng(val["lat"],val["long"])
+                var marker = markers[driver_id]
+                if (tracked_marker != null && marker.title == tracked_marker.title){
+                  map.panTo(marker.getPosition());
+                }
+                marker.setPosition(position)          
                 markers[driver_id] = marker
               }
-            }else{
-            console.log('Invalid Driver Id')
-          }
-          map.fitBounds(bounds);
+            });
+
+            myFirebase.on('child_removed', function(snapshot) {
+              var driver_id = snapshot.key()
+              if (parseInt(driver_id)) {
+                var val = snapshot.val()
+                var position = new google.maps.LatLng(val["lat"],val["long"])
+                var marker = markers[driver_id]          
+                marker.setMap(null)
+                markers[driver_id] = null
+              }
+            });
+
+          });
         }
-        var current_info_window;
-        myFirebase.on('child_added', function(snapshot) {
-        var driver_id = snapshot.key()
-        if (parseInt(driver_id)) {
-            if (markers[driver_id] == null) {
-              var val = snapshot.val()
-              var position = new google.maps.LatLng(val["lat"],val["long"])
-              var marker = new google.maps.Marker({
-                  position: position,
-                  icon: icons['car'].icon,
-                  title: driver_id,
-                  map: map
-                  
-              });
-              marker.setMap(map)
-              marker.addListener('click', function() {
-                // var drivers = "<%= "Name: #{@drivers.first.name}  $(marker.title) Phone: #{@drivers.first.phone}  Availability: #{Driver.driver_avilabilities.keys[@drivers.first[:driver_availability]]}  State: #{Driver.driver_states.keys[@drivers.first[:driver_state]]}"%>"
-                var drivers = "<%= @drivers%>"
-                var driversCount = drivers.length
-                var driver = "Not find"
-                <% @drivers.each do |driver| %>
-                  if (<%=driver.id%> == marker.title){
-                    if (current_info_window != null){
-                      current_info_window.close()
-                    }
-                    var infowindow = new google.maps.InfoWindow({
-                      content: "<p>" +"<%=driver.name%>" + "<br />" + "<%=driver.get_driver_type%>" + "<br />" + "<%=driver.availability_string%>" + "<br />" + "<%= driver.state_string%>" + "</p>"
-                    });
-                    infowindow.open(map, marker);
-                    current_info_window = infowindow
-                  }
-                <%end%>
-
-              });
-
-              markers[driver_id] = marker
-            }else{
-              var marker = markers[driver_id]
-              marker.addListener('click', function() {
-                  var drivers = "<%= @drivers%>"
-                  var driversCount = drivers.length
-                  var driver = "Not found"
-                  <% @drivers.each do |driver| %>
-                    if (<%=driver.id%> == marker.title){
-                    if (current_info_window != null){
-                      current_info_window.close()
-                    }
-                      var infowindow = new google.maps.InfoWindow({
-                      content: "<p>" +"<%=driver.name%>" + "<br />" + "<%=driver.get_driver_type%>" + "<br />" + "<%=driver.availability_string%>" + "<br />" + "<%= driver.state_string%>" + "</p>"
-                      });
-                      infowindow.open(map, marker);
-                      current_info_window = infowindow
-                    }
-                  <%end%>
-
-                });
-            }
-          }else{
-        }
-      });
-
-      myFirebase.on('child_changed', function(snapshot) {
-        var driver_id = snapshot.key()
-        if (parseInt(driver_id)) {
-          var val = snapshot.val()
-          var position = new google.maps.LatLng(val["lat"],val["long"])
-          var marker = markers[driver_id]
-          if (tracked_marker != null && marker.title == tracked_marker.title){
-            map.panTo(marker.getPosition());
-            // map.setZoom(<%=Rails.application.secrets.Default_ZOOM%>);
-          }
-          marker.setPosition(position)          
-          markers[driver_id] = marker
-          }else{
-        }
-      });
-      myFirebase.on('child_removed', function(snapshot) {
-        var driver_id = snapshot.key()
-        if (parseInt(driver_id)) {
-          var val = snapshot.val()
-          var position = new google.maps.LatLng(val["lat"],val["long"])
-          var marker = markers[driver_id]          
-          marker.setMap(null)
-          markers[driver_id] = null
-          }else{
-            console.log('Invalid Driver Id')
-        }
-      });
-      });
-      
-
-
-    }
-
-    // Begin listening for data
-    startListening();
+        startListening();
       }
     </script>
+
     <script async defer
     src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDabHITcg1cwDz_ofOLxjQqe9kG9zFf2yM&callback=initMap">
     </script>
