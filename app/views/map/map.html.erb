@@ -77,7 +77,6 @@
       });
 
       document.getElementById('AllDrivers').addEventListener("click", function(){
-        console.log('All Drivers')
         tracked_marker = null;
         var bounds = new google.maps.LatLngBounds();
         for (var marker_id in markers) {
@@ -110,7 +109,7 @@
             var drivers = snapshot.val()
             var bounds = new google.maps.LatLngBounds();
             for (var driver_id in drivers) {
-              if (parseInt(driver_id)) {
+              if (parseInt(driver_id) && isOnline(driver_id)) {
                 if (markers[driver_id] == null) {
                   var val = drivers[driver_id]
                   var position = new google.maps.LatLng(val["lat"],val["long"])
@@ -132,7 +131,7 @@
 
             myFirebase.on('child_added', function(snapshot) {
               var driver_id = snapshot.key()
-              if (parseInt(driver_id)) {
+              if (parseInt(driver_id) && isOnline(driver_id)) {
                 if (markers[driver_id] == null) {
                   var val = snapshot.val()
                   var position = new google.maps.LatLng(val["lat"],val["long"])
@@ -144,6 +143,7 @@
 
                   });
                   marker.setMap(map)
+
                   marker.addListener('click', function() {
                     <% @drivers.each do |driver| %>
                       if (<%=driver.id%> == marker.title){
@@ -164,6 +164,7 @@
 
                 } else {
                   var marker = markers[driver_id]
+
                   marker.addListener('click', function() {
                     <% @drivers.each do |driver| %>
                       if (<%=driver.id%> == marker.title){
@@ -211,7 +212,17 @@
 
           });
         }
+
         startListening();
+      }
+
+      function isOnline(driver_id){
+        <% @drivers.each do |driver| %>
+          if (<%=driver.id%> == driver_id){
+            return true;
+          }
+        <%end%>
+        return false;
       }
     </script>
 
